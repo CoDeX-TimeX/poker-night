@@ -1,144 +1,727 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Poker Player VIP</title>
     <style>
-        /* --- CORE STYLES --- */
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@400;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            margin: 0; 
-            background: linear-gradient(180deg, #121212 0%, #050505 100%);
-            color: white; 
-            font-family: 'Segoe UI', sans-serif;
-            /* FIX FOR MOBILE BROWSERS: Use dynamic viewport height */
+            margin: 0;
+            background: #1a3a2e;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,.05) 2px, rgba(0,0,0,.05) 4px),
+                repeating-linear-gradient(-45deg, transparent, transparent 2px, rgba(0,0,0,.05) 2px, rgba(0,0,0,.05) 4px),
+                linear-gradient(180deg, #1a5a3a 0%, #0d2818 100%);
+            color: white;
+            font-family: 'Roboto', sans-serif;
             height: 100vh;
-            height: 100dvh; 
-            width: 100vw; 
-            overflow: hidden; 
-            display: flex; 
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
             flex-direction: column;
+            position: relative;
+        }
+
+        /* Felt Texture Overlay */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        /* Wood Rail */
+        .wood-rail {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: linear-gradient(180deg, #4a2511 0%, #2d1507 100%);
+            border-top: 2px solid #654321;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+            z-index: 1000;
         }
 
         /* HEADER */
         .header {
-            height: 60px; 
-            background: #1a1a1a; 
-            border-bottom: 1px solid #333; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 0 20px; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-            flex-shrink: 0; /* Prevent header from shrinking */
+            height: 70px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.4) 100%);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 100;
         }
-        .btn-fold { background: #c0392b; color: white; border: none; padding: 8px 20px; border-radius: 5px; font-weight: bold; }
+
+        .btn-fold {
+            background: linear-gradient(145deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4),
+                        inset 0 -2px 5px rgba(0,0,0,0.3);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-fold:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 10px rgba(231, 76, 60, 0.4);
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .player-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(145deg, #ffd700, #ffed4e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 2px 10px rgba(255, 215, 0, 0.5);
+        }
+
+        #disp-name {
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 18px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 2px;
+        }
 
         /* FOLD OVERLAY */
-        #folded-overlay { display: none; position: absolute; top: 60px; left: 0; width: 100%; height: calc(100% - 60px); background: rgba(0,0,0,0.85); z-index: 900; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
-        .folded-text { font-size: 40px; color: #e74c3c; font-weight: bold; letter-spacing: 5px; border: 4px solid #e74c3c; padding: 10px 40px; transform: rotate(-10deg); margin-bottom: 20px; }
-        .btn-unfold { background: transparent; border: 1px solid #777; color: #aaa; padding: 10px 20px; border-radius: 20px; cursor: pointer; }
+        #folded-overlay {
+            display: none;
+            position: absolute;
+            top: 70px;
+            left: 0;
+            width: 100%;
+            height: calc(100% - 70px);
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 900;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .folded-text {
+            font-size: 60px;
+            color: #e74c3c;
+            font-weight: bold;
+            letter-spacing: 10px;
+            border: 5px solid #e74c3c;
+            padding: 20px 60px;
+            transform: rotate(-15deg);
+            margin-bottom: 30px;
+            font-family: 'Bebas Neue', sans-serif;
+            text-shadow: 0 0 20px rgba(231, 76, 60, 0.8);
+            animation: foldPulse 2s infinite;
+        }
+
+        @keyframes foldPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .btn-unfold {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid #777;
+            color: #aaa;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-unfold:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: #fff;
+            color: #fff;
+        }
 
         /* MIDDLE AREA */
-        .middle-stage { 
-            flex-grow: 1; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            position: relative; 
-            overflow-y: auto; /* Allow scrolling if screen is too small */
+        .middle-stage {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 20px;
         }
-        .balance-val { font-size: 32px; color: #2ecc71; font-weight: bold; }
-        
-        .staging-box { 
-            background: rgba(255, 255, 255, 0.05); 
-            border: 2px solid #444; 
-            border-radius: 15px; 
-            padding: 10px 40px; 
-            text-align: center; 
-            min-width: 250px; 
-            margin-top: 10px;
-        }
-        .staged-total { font-size: 50px; color: #ffd700; font-weight: bold; text-shadow: 0 0 15px rgba(255, 215, 0, 0.4); margin: 5px 0; }
-        
-        /* NEW BUTTONS */
-        .action-row { display: flex; gap: 10px; margin-top: 10px; justify-content: center; }
-        .btn-push { background: linear-gradient(to bottom, #2ecc71, #27ae60); color: white; border: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold; box-shadow: 0 0 10px rgba(46, 204, 113, 0.3); }
-        .btn-call { background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; display: none; animation: pulse 2s infinite; }
-        .btn-clear { background: transparent; border: 1px solid #555; color: #888; padding: 10px 15px; border-radius: 5px; font-size: 12px; }
 
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(52, 152, 219, 0); } 100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); } }
-
-        /* CHIPS */
-        .chip-dock { 
-            height: 100px; /* Slightly taller */
-            background: #0f0f0f; 
-            border-top: 2px solid #333; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            gap: 15px; 
-            flex-shrink: 0; /* Prevent chips from being squished */
-            padding-bottom: 20px; /* LIFT UP from bottom edge */
+        .balance-container {
+            text-align: center;
+            margin-bottom: 30px;
         }
-        .chip { width: 65px; height: 65px; border-radius: 50%; border: 4px dashed rgba(255,255,255,0.7); display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 18px; cursor: pointer; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .chip:active { transform: scale(0.9); top: 2px; }
-        .c1 { background: #e0e0e0; color: #333; } .c5 { background: #c0392b; color: white; } .c25 { background: #27ae60; color: white; } .c100 { background: #2c3e50; color: #ffd700; border-color: #ffd700; }
+
+        .balance-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 2px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .balance-val {
+            font-size: 48px;
+            color: #2ecc71;
+            font-weight: bold;
+            font-family: 'Bebas Neue', sans-serif;
+            text-shadow: 0 0 20px rgba(46, 204, 113, 0.6),
+                         0 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: 3px;
+        }
+
+        .balance-val.low {
+            color: #e74c3c;
+            animation: lowChipsWarning 1s infinite;
+        }
+
+        @keyframes lowChipsWarning {
+            0%, 100% { text-shadow: 0 0 20px rgba(231, 76, 60, 0.6); }
+            50% { text-shadow: 0 0 30px rgba(231, 76, 60, 1); }
+        }
+
+        /* STAGING BOX */
+        .staging-box {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 20px;
+            padding: 20px 40px;
+            text-align: center;
+            min-width: 280px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
+                        inset 0 1px 0 rgba(255,255,255,0.1);
+            position: relative;
+        }
+
+        .staging-label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 2px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .staged-total {
+            font-size: 56px;
+            color: #ffd700;
+            font-weight: bold;
+            font-family: 'Bebas Neue', sans-serif;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.8),
+                         0 4px 8px rgba(0,0,0,0.5);
+            margin: 10px 0;
+            letter-spacing: 4px;
+        }
+
+        /* ACTION BUTTONS */
+        .action-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .quick-bets {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+            justify-content: center;
+        }
+
+        .btn-quick {
+            background: rgba(52, 152, 219, 0.2);
+            border: 1px solid rgba(52, 152, 219, 0.5);
+            color: #3498db;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-quick:active {
+            background: rgba(52, 152, 219, 0.4);
+            transform: scale(0.95);
+        }
+
+        .btn-push {
+            background: linear-gradient(145deg, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4),
+                        inset 0 -3px 8px rgba(0,0,0,0.3);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        .btn-push:active {
+            transform: translateY(3px);
+            box-shadow: 0 3px 15px rgba(46, 204, 113, 0.4);
+        }
+
+        .btn-call {
+            background: linear-gradient(145deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            display: none;
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4),
+                        inset 0 -3px 8px rgba(0,0,0,0.3);
+            cursor: pointer;
+            animation: callPulse 2s infinite;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        @keyframes callPulse {
+            0%, 100% { box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4); }
+            50% { box-shadow: 0 6px 30px rgba(52, 152, 219, 0.8); }
+        }
+
+        .btn-allin {
+            background: linear-gradient(145deg, #e74c3c, #c0392b);
+            color: #ffd700;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            display: none;
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4),
+                        inset 0 -3px 8px rgba(0,0,0,0.3);
+            cursor: pointer;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        .btn-clear {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: rgba(255,255,255,0.6);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        /* CHIPS - 3D REALISTIC */
+        .chip-dock {
+            height: 120px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 100%);
+            border-top: 2px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 25px;
+            padding: 0 20px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 50;
+        }
+
+        .chip {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 20px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.15s;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        /* Edge spots (dashed border effect) */
+        .chip::before {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 50%;
+            padding: 3px;
+            background: repeating-conic-gradient(
+                from 0deg,
+                currentColor 0deg 20deg,
+                transparent 20deg 40deg
+            );
+            -webkit-mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+        }
+
+        /* Inner detail circle */
+        .chip::after {
+            content: '';
+            position: absolute;
+            inset: 12px;
+            border-radius: 50%;
+            border: 2px dashed currentColor;
+            opacity: 0.4;
+        }
+
+        .chip:active {
+            transform: scale(0.9) translateY(3px);
+        }
+
+        .chip:hover {
+            transform: scale(1.05);
+            filter: brightness(1.2);
+        }
+
+        /* White Chip - $1 */
+        .c1 {
+            background: radial-gradient(circle at 30% 30%, #ffffff, #e8e8e8 60%, #c0c0c0);
+            color: #333;
+            box-shadow: 
+                0 6px 20px rgba(0,0,0,0.4),
+                inset 0 1px 0 rgba(255,255,255,0.8),
+                inset 0 -2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* Red Chip - $5 */
+        .c5 {
+            background: radial-gradient(circle at 30% 30%, #ff6b6b, #e74c3c 60%, #c0392b);
+            color: white;
+            box-shadow: 
+                0 6px 20px rgba(231, 76, 60, 0.5),
+                inset 0 1px 0 rgba(255,255,255,0.3),
+                inset 0 -2px 5px rgba(0,0,0,0.3);
+        }
+
+        /* Green Chip - $25 */
+        .c25 {
+            background: radial-gradient(circle at 30% 30%, #2ecc71, #27ae60 60%, #229954);
+            color: white;
+            box-shadow: 
+                0 6px 20px rgba(46, 204, 113, 0.5),
+                inset 0 1px 0 rgba(255,255,255,0.3),
+                inset 0 -2px 5px rgba(0,0,0,0.3);
+        }
+
+        /* Black Chip - $100 */
+        .c100 {
+            background: radial-gradient(circle at 30% 30%, #34495e, #2c3e50 60%, #1a252f);
+            color: #ffd700;
+            box-shadow: 
+                0 6px 20px rgba(0,0,0,0.7),
+                0 0 15px rgba(255, 215, 0, 0.3),
+                inset 0 1px 0 rgba(255,255,255,0.2),
+                inset 0 -2px 5px rgba(0,0,0,0.5);
+        }
+
+        .c100::before {
+            color: #ffd700;
+        }
 
         /* LOGIN */
-        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .login-input { background: #222; border: 1px solid #444; color: #ffd700; padding: 15px; width: 60%; font-size: 18px; text-align: center; margin: 10px; border-radius: 8px; }
-        .login-btn { background: #ffd700; color: #000; border: none; padding: 15px 40px; font-size: 20px; font-weight: bold; margin-top: 20px; border-radius: 8px; }
+        #login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-title {
+            color: #ffd700;
+            letter-spacing: 5px;
+            font-size: 48px;
+            font-family: 'Bebas Neue', sans-serif;
+            margin-bottom: 40px;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+        }
+
+        .login-input {
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            color: #ffd700;
+            padding: 16px 24px;
+            width: 70%;
+            max-width: 350px;
+            font-size: 18px;
+            text-align: center;
+            margin: 10px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+        }
+
+        .login-input:focus {
+            outline: none;
+            border-color: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .login-btn {
+            background: linear-gradient(145deg, #ffd700, #f39c12);
+            color: #000;
+            border: none;
+            padding: 16px 50px;
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 30px;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 6px 25px rgba(255, 215, 0, 0.4),
+                        inset 0 -3px 8px rgba(0,0,0,0.2);
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 2px;
+            transition: all 0.2s;
+        }
+
+        .login-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 3px 15px rgba(255, 215, 0, 0.4);
+        }
 
         /* INFO BADGE */
-        .info-badge { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 5px; font-size: 12px; color: #aaa; }
+        .info-badge {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        /* PARTICLES */
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #ffd700;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particleFall 1s forwards;
+            box-shadow: 0 0 10px #ffd700;
+        }
+
+        @keyframes particleFall {
+            to {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* FLYING CHIP ANIMATION */
+        .flying-chip {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 999;
+            animation: flyToPot 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        @keyframes flyToPot {
+            0% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.3) rotate(180deg);
+            }
+            100% {
+                transform: scale(0.5) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* SCREEN FLASH */
+        .screen-flash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            pointer-events: none;
+            z-index: 9998;
+            animation: flash 0.3s;
+        }
+
+        @keyframes flash {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 0.5; }
+        }
+
+        /* VICTORY OVERLAY */
+        .victory-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle, rgba(255,215,0,0.3) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 9997;
+            animation: victoryGlow 1s;
+        }
+
+        @keyframes victoryGlow {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        /* BET HISTORY */
+        .bet-history {
+            position: absolute;
+            top: 80px;
+            right: 10px;
+            background: rgba(0,0,0,0.6);
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            color: #aaa;
+            max-width: 150px;
+            backdrop-filter: blur(10px);
+        }
+
+        .bet-history-item {
+            padding: 5px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .bet-history-item:last-child {
+            border-bottom: none;
+        }
     </style>
 </head>
+
 <body>
 
+    <div class="wood-rail"></div>
+
     <div id="login-screen">
-        <h1 style="color:#ffd700; letter-spacing:3px;">POKER LOGIN</h1>
-        <input id="room" class="login-input" placeholder="Room (e.g. TABLE1)">
-        <input id="pass" class="login-input" type="number" placeholder="Password">
-        <input id="name" class="login-input" placeholder="Your Name">
+        <div class="login-title">POKER VIP</div>
+        <input id="room" class="login-input" placeholder="Room Code" autocomplete="off">
+        <input id="pass" class="login-input" type="number" placeholder="Password" autocomplete="off">
+        <input id="name" class="login-input" placeholder="Player Name" autocomplete="off">
         <button class="login-btn" onclick="joinGame()">ENTER TABLE</button>
     </div>
 
     <div id="folded-overlay">
         <div class="folded-text">FOLDED</div>
-        <button class="btn-unfold" onclick="unfold()">Wait no, Undo!</button>
+        <button class="btn-unfold" onclick="unfold()">Undo Fold</button>
     </div>
 
     <div id="app-interface" style="display:none; height:100%; flex-direction:column;">
         <div class="header">
             <button class="btn-fold" onclick="foldHand()">✖ FOLD</button>
-            <div id="disp-name" style="color:#aaa; font-weight:bold;">PLAYER</div>
+            <div class="player-info">
+                <div class="player-avatar" id="avatar">🃏</div>
+                <div id="disp-name">PLAYER</div>
+            </div>
         </div>
 
         <div class="middle-stage">
-            <div class="info-badge" id="call-info">Bet to match: $0</div>
+            <div class="info-badge" id="call-info">TABLE: $0</div>
             
-            <div style="font-size:12px; color:#666; margin-bottom:5px;">MY WALLET</div>
-            <div class="balance-val" id="disp-bal">$1000</div>
+            <div class="bet-history" id="bet-history" style="display:none;">
+                <div style="font-weight:bold; margin-bottom:5px;">LAST BETS:</div>
+            </div>
+
+            <div class="balance-container">
+                <div class="balance-label">WALLET</div>
+                <div class="balance-val" id="disp-bal">$1000</div>
+            </div>
 
             <div class="staging-box">
-                <div style="font-size:12px; color:#aaa;">ADDING TO POT</div>
+                <div class="staging-label">BETTING</div>
                 <div class="staged-total" id="staged-val">$0</div>
-                
+
+                <div class="quick-bets" id="quick-bets" style="display:none;">
+                    <button class="btn-quick" onclick="quickBet('half')">½ POT</button>
+                    <button class="btn-quick" onclick="quickBet('pot')">POT</button>
+                    <button class="btn-quick" onclick="quickBet('2x')">2x POT</button>
+                </div>
+
                 <div class="action-row">
-                    <button class="btn-clear" onclick="clearStage()">CLR</button>
+                    <button class="btn-clear" onclick="clearStage()">CLEAR</button>
                     <button class="btn-call" id="btn-call" onclick="matchCall()">CALL $0</button>
+                    <button class="btn-allin" id="btn-allin" onclick="goAllIn()">ALL IN</button>
                     <button class="btn-push" onclick="pushToPot()">BET</button>
                 </div>
             </div>
         </div>
 
         <div class="chip-dock">
-            <div class="chip c1" onclick="addChip(1)">1</div>
-            <div class="chip c5" onclick="addChip(5)">5</div>
-            <div class="chip c25" onclick="addChip(25)">25</div>
-            <div class="chip c100" onclick="addChip(100)">100</div>
+            <div class="chip c1" onclick="addChip(1)" oncontextmenu="return longPress(1)">1</div>
+            <div class="chip c5" onclick="addChip(5)" oncontextmenu="return longPress(5)">5</div>
+            <div class="chip c25" onclick="addChip(25)" oncontextmenu="return longPress(25)">25</div>
+            <div class="chip c100" onclick="addChip(100)" oncontextmenu="return longPress(100)">100</div>
         </div>
     </div>
 
@@ -159,59 +742,167 @@
         const db = getDatabase(app);
 
         let roomID = "", myName = "", currentBalance = 1000, stagedAmount = 0;
-        let myCurrentBet = 0, highestBet = 0;
+        let myCurrentBet = 0, highestBet = 0, currentPot = 0;
+        let betHistory = [];
 
-        window.joinGame = function() {
+        // AUDIO SYSTEM
+        const sounds = {
+            chipClick: createSound([800, 1000], 0.05, 'sine'),
+            chipSlide: createSound([400, 200], 0.15, 'triangle'),
+            chipWin: createSound([523, 659, 784], 0.3, 'sine'),
+            fold: createSound([200, 100], 0.2, 'sawtooth'),
+            allIn: createSound([1047, 1175, 1319, 1568], 0.4, 'square')
+        };
+
+        function createSound(frequencies, duration, type) {
+            return function() {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                frequencies.forEach((freq, i) => {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    oscillator.frequency.value = freq;
+                    oscillator.type = type;
+                    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+                    oscillator.start(audioContext.currentTime + i * 0.05);
+                    oscillator.stop(audioContext.currentTime + duration + i * 0.05);
+                });
+            };
+        }
+
+        function vibrate(pattern) {
+            if (navigator.vibrate) {
+                navigator.vibrate(pattern);
+            }
+        }
+
+        function screenFlash() {
+            const flash = document.createElement('div');
+            flash.className = 'screen-flash';
+            document.body.appendChild(flash);
+            setTimeout(() => flash.remove(), 300);
+        }
+
+        function createParticles(x, y, count = 20) {
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.animationDelay = (i * 0.05) + 's';
+                document.body.appendChild(particle);
+                setTimeout(() => particle.remove(), 1000);
+            }
+        }
+
+        function addBetToHistory(amount, action) {
+            betHistory.unshift({ amount, action, time: Date.now() });
+            if (betHistory.length > 3) betHistory.pop();
+            updateBetHistoryDisplay();
+        }
+
+        function updateBetHistoryDisplay() {
+            const container = document.getElementById('bet-history');
+            if (betHistory.length > 0) {
+                container.style.display = 'block';
+                container.innerHTML = '<div style="font-weight:bold; margin-bottom:5px;">LAST BETS:</div>';
+                betHistory.forEach(bet => {
+                    const item = document.createElement('div');
+                    item.className = 'bet-history-item';
+                    item.innerHTML = `<span style="color:#2ecc71;">$${bet.amount}</span> - ${bet.action}`;
+                    container.appendChild(item);
+                });
+            }
+        }
+
+        window.joinGame = function () {
             roomID = document.getElementById('room').value.trim().toUpperCase();
             const pass = document.getElementById('pass').value.trim();
             myName = document.getElementById('name').value.trim();
-            if(!roomID || !pass || !myName) return alert("Fill all fields");
+            if (!roomID || !pass || !myName) return alert("Fill all fields");
 
             get(ref(db, `games/${roomID}`)).then(snap => {
-                if(snap.exists() && String(snap.val().password) === pass) {
+                if (snap.exists() && String(snap.val().password) === pass) {
                     initPlayer();
-                } else { alert("Wrong Room or Password!"); }
+                    sounds.chipWin();
+                } else { 
+                    alert("Wrong Room or Password!");
+                    vibrate(200);
+                }
             });
         }
 
         function initPlayer() {
             const myRef = ref(db, `games/${roomID}/players/${myName}`);
-            // Force active
             update(myRef, { status: 'active' });
             get(myRef).then(snap => {
-                if(!snap.exists()) update(myRef, { chips: 1000, currentBet: 0, status: 'active' });
+                if (!snap.exists()) update(myRef, { chips: 1000, currentBet: 0, status: 'active' });
             });
 
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-interface').style.display = 'flex';
             document.getElementById('disp-name').innerText = myName;
+            
+            // Random avatar emoji
+            const avatars = ['🃏', '♠️', '♥️', '♦️', '♣️', '🎰', '🎲', '👑'];
+            document.getElementById('avatar').innerText = avatars[Math.floor(Math.random() * avatars.length)];
 
-            // 1. Listen to ME (Balance/Status)
+            // Listen to ME
             onValue(myRef, (s) => {
                 const data = s.val();
-                if(data) {
+                if (data) {
                     currentBalance = data.chips;
                     myCurrentBet = data.currentBet || 0;
                     document.getElementById('disp-bal').innerText = "$" + currentBalance;
-                    
-                    // Fold Overlay
+
+                    // Low chips warning
+                    const balEl = document.getElementById('disp-bal');
+                    if (currentBalance < 100) {
+                        balEl.classList.add('low');
+                    } else {
+                        balEl.classList.remove('low');
+                    }
+
+                    // Show all-in button if low
+                    if (currentBalance < 200) {
+                        document.getElementById('btn-allin').style.display = 'block';
+                    } else {
+                        document.getElementById('btn-allin').style.display = 'none';
+                    }
+
+                    // Fold overlay
                     const overlay = document.getElementById('folded-overlay');
-                    if(data.status === 'folded') overlay.style.display = 'flex';
+                    if (data.status === 'folded') overlay.style.display = 'flex';
                     else overlay.style.display = 'none';
 
-                    updateCallButton(); // Update when my data changes
+                    updateCallButton();
                 }
             });
 
-            // 2. Listen to ROOM (To calculate Calls)
-            onValue(ref(db, `games/${roomID}/players`), (s) => {
-                const players = s.val() || {};
-                let max = 0;
-                Object.values(players).forEach(p => {
-                    if((p.currentBet || 0) > max) max = p.currentBet;
-                });
-                highestBet = max;
-                updateCallButton();
+            // Listen to ROOM
+            onValue(ref(db, `games/${roomID}`), (s) => {
+                const game = s.val();
+                if (game) {
+                    currentPot = game.pot || 0;
+                    
+                    // Show quick bet buttons if pot > 0
+                    if (currentPot > 0) {
+                        document.getElementById('quick-bets').style.display = 'flex';
+                    } else {
+                        document.getElementById('quick-bets').style.display = 'none';
+                    }
+
+                    if (game.players) {
+                        let max = 0;
+                        Object.values(game.players).forEach(p => {
+                            if ((p.currentBet || 0) > max) max = p.currentBet;
+                        });
+                        highestBet = max;
+                        updateCallButton();
+                    }
+                }
             });
         }
 
@@ -220,58 +911,121 @@
             const btn = document.getElementById('btn-call');
             const infoBadge = document.getElementById('call-info');
 
-            // Update info badge
-            if(diff > 0) {
-                infoBadge.innerText = `Bet to match: $${highestBet}`;
-                infoBadge.style.color = '#f39c12';
+            if (diff > 0) {
+                infoBadge.innerText = `TABLE: $${highestBet}`;
+                infoBadge.style.borderColor = 'rgba(231, 76, 60, 0.5)';
+                infoBadge.style.color = '#e74c3c';
             } else {
-                infoBadge.innerText = `Bet to match: $0`;
-                infoBadge.style.color = '#aaa';
+                infoBadge.innerText = `TABLE: $${highestBet}`;
+                infoBadge.style.borderColor = 'rgba(255, 215, 0, 0.3)';
+                infoBadge.style.color = '#ffd700';
             }
 
-            // Only show call button if there is a difference AND we haven't already staged enough
-            if(diff > 0 && stagedAmount < diff) {
+            if (diff > 0 && stagedAmount < diff) {
                 btn.style.display = 'block';
                 btn.innerText = `CALL $${diff}`;
-                // Store the needed amount in a data attribute
                 btn.dataset.needed = diff;
             } else {
                 btn.style.display = 'none';
             }
         }
 
-        window.matchCall = function() {
+        window.matchCall = function () {
             const diff = parseInt(document.getElementById('btn-call').dataset.needed || 0);
-            if(diff > 0) {
-                const toAdd = diff - stagedAmount;
-                if(stagedAmount + toAdd > currentBalance) {
-                     alert("ALL IN! You are betting your whole stack.");
-                     stagedAmount = currentBalance;
-                } else {
-                     stagedAmount += toAdd;
-                }
-                document.getElementById('staged-val').innerText = "$" + stagedAmount;
-                updateCallButton();
+            if (diff === 0) return;
+            
+            if (diff > currentBalance) {
+                stagedAmount = currentBalance;
+                alert("ALL IN! Calling with everything you have.");
+                sounds.allIn();
+                vibrate([100, 50, 100, 50, 100]);
+                screenFlash();
+            } else {
+                stagedAmount = diff;
+                sounds.chipClick();
+                vibrate(50);
             }
-        }
-
-        window.addChip = function(amt) {
-            if(stagedAmount + amt > currentBalance) return alert("ALL IN! You don't have enough chips.");
-            stagedAmount += amt;
+            
             document.getElementById('staged-val').innerText = "$" + stagedAmount;
-            updateCallButton(); // Re-check if we covered the call
-        }
-
-        window.clearStage = function() {
-            stagedAmount = 0;
-            document.getElementById('staged-val').innerText = "$0";
             updateCallButton();
         }
 
-        window.pushToPot = function() {
-            if(stagedAmount === 0) return;
-            // Double check safety
-            if(stagedAmount > currentBalance) return alert("Not enough chips!");
+        window.addChip = function (amt) {
+            if (stagedAmount + amt > currentBalance) {
+                alert("Not enough chips! (Tap and hold chip for 10x)");
+                vibrate(200);
+                return;
+            }
+            stagedAmount += amt;
+            document.getElementById('staged-val').innerText = "$" + stagedAmount;
+            updateCallButton();
+            sounds.chipClick();
+            vibrate(30);
+        }
+
+        window.longPress = function(amt) {
+            // Right-click / long press for 10x
+            const multiplied = amt * 10;
+            if (stagedAmount + multiplied > currentBalance) {
+                alert("Not enough chips for 10x!");
+                vibrate(200);
+            } else {
+                stagedAmount += multiplied;
+                document.getElementById('staged-val').innerText = "$" + stagedAmount;
+                updateCallButton();
+                sounds.chipSlide();
+                vibrate([50, 30, 50]);
+            }
+            return false; // Prevent context menu
+        }
+
+        window.quickBet = function(type) {
+            let amount = 0;
+            if (type === 'half') amount = Math.floor(currentPot / 2);
+            else if (type === 'pot') amount = currentPot;
+            else if (type === '2x') amount = currentPot * 2;
+
+            if (amount > currentBalance) amount = currentBalance;
+            stagedAmount = amount;
+            document.getElementById('staged-val').innerText = "$" + stagedAmount;
+            updateCallButton();
+            sounds.chipSlide();
+            vibrate(50);
+        }
+
+        window.goAllIn = function() {
+            if (confirm("GO ALL IN with $" + currentBalance + "?")) {
+                stagedAmount = currentBalance;
+                document.getElementById('staged-val').innerText = "$" + stagedAmount;
+                updateCallButton();
+                sounds.allIn();
+                vibrate([100, 50, 100, 50, 200]);
+                screenFlash();
+            }
+        }
+
+        window.clearStage = function () {
+            stagedAmount = 0;
+            document.getElementById('staged-val').innerText = "$0";
+            updateCallButton();
+            vibrate(30);
+        }
+
+        window.pushToPot = function () {
+            if (stagedAmount === 0) {
+                alert("Stage some chips first!");
+                vibrate(100);
+                return;
+            }
+            
+            if (stagedAmount > currentBalance) {
+                alert("Error: Not enough chips!");
+                vibrate(200);
+                return;
+            }
+
+            // Flying chip animation
+            createFlyingChip(stagedAmount);
 
             get(ref(db, `games/${roomID}`)).then(snap => {
                 const game = snap.val();
@@ -280,21 +1034,48 @@
                 updates[`games/${roomID}/players/${myName}/currentBet`] = myCurrentBet + stagedAmount;
                 updates[`games/${roomID}/pot`] = (game.pot || 0) + stagedAmount;
                 update(ref(db), updates);
-                
+
+                addBetToHistory(stagedAmount, stagedAmount >= currentBalance ? 'ALL IN' : 'BET');
+                sounds.chipSlide();
+                vibrate([50, 30]);
+
                 stagedAmount = 0;
                 document.getElementById('staged-val').innerText = "$0";
             });
         }
 
-        window.foldHand = function() {
-            if(confirm("Fold this hand?")) {
+        function createFlyingChip(amount) {
+            const chip = document.createElement('div');
+            chip.className = 'flying-chip';
+            
+            // Determine chip color based on amount
+            if (amount >= 100) chip.style.background = 'radial-gradient(circle, #34495e, #2c3e50)';
+            else if (amount >= 25) chip.style.background = 'radial-gradient(circle, #2ecc71, #27ae60)';
+            else if (amount >= 5) chip.style.background = 'radial-gradient(circle, #e74c3c, #c0392b)';
+            else chip.style.background = 'radial-gradient(circle, #ffffff, #e8e8e8)';
+
+            chip.style.left = '50%';
+            chip.style.bottom = '100px';
+            chip.style.boxShadow = '0 4px 15px rgba(0,0,0,0.5)';
+            
+            document.body.appendChild(chip);
+            setTimeout(() => chip.remove(), 600);
+        }
+
+        window.foldHand = function () {
+            if (confirm("Fold this hand?")) {
                 update(ref(db, `games/${roomID}/players/${myName}`), { status: 'folded' });
+                sounds.fold();
+                vibrate([100, 50, 100]);
+                addBetToHistory(0, 'FOLD');
             }
         }
-        
-        window.unfold = function() {
+
+        window.unfold = function () {
             update(ref(db, `games/${roomID}/players/${myName}`), { status: 'active' });
+            vibrate(50);
         }
     </script>
 </body>
+
 </html>
