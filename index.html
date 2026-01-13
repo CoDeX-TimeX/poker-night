@@ -1,314 +1,50 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Poker Night Tracker</title>
+    <title>Poker Night Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        /* CASINO STYLING */
         body {
-            background-color: #0f3d0f;
-            /* Dark Green */
+            background: #111;
             color: white;
-            font-family: 'Arial', sans-serif;
+            font-family: sans-serif;
             text-align: center;
-            margin: 0;
-            padding: 20px;
-            padding-bottom: 100px;
-            /* Space for buttons */
-        }
-
-        h1 {
-            color: #ffd700;
-            text-shadow: 2px 2px 0px #000;
-        }
-
-        /* LOGIN SCREEN */
-        #login-screen {
-            margin-top: 50px;
-        }
-
-        input {
-            padding: 15px;
-            font-size: 18px;
-            border-radius: 5px;
-            border: none;
-            width: 70%;
-            max-width: 300px;
-        }
-
-        .btn-join {
-            background-color: #ffd700;
-            border: none;
-            padding: 15px 30px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-            border-radius: 5px;
-        }
-
-        /* POT DISPLAY */
-        .pot-container {
-            background: rgba(0, 0, 0, 0.4);
-            border: 3px solid #ffd700;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 30px;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
-        }
-
-        .pot-label {
-            font-size: 14px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: #ccc;
-        }
-
-        #pot-amount {
-            font-size: 60px;
-            font-weight: bold;
-            color: #ffd700;
-            margin: 10px 0;
-        }
-
-        /* PLAYER LIST */
-        .player-card {
-            background: white;
-            color: #333;
-            padding: 15px;
-            margin: 10px auto;
-            border-radius: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 500px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        }
-
-        .p-info {
-            text-align: left;
-        }
-
-        .p-name {
-            font-weight: bold;
-            font-size: 18px;
-            display: block;
-        }
-
-        .p-bet {
-            font-size: 12px;
-            color: #666;
-            background: #eee;
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-
-        .p-chips {
-            font-size: 22px;
-            font-weight: bold;
-            color: #006400;
-        }
-
-        /* CONTROLS (FIXED BOTTOM) */
-        .controls {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: #0a290a;
-            padding: 15px 0;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 -5px 10px rgba(0, 0, 0, 0.5);
+            padding-top: 50px;
         }
 
         .btn {
-            padding: 15px 20px;
-            border: none;
-            border-radius: 8px;
+            display: block;
+            width: 80%;
+            max-width: 300px;
+            margin: 20px auto;
+            padding: 25px;
+            font-size: 20px;
             font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            color: #000;
+            text-decoration: none;
+            border-radius: 10px;
         }
 
-        .btn-10 {
-            background-color: #ddd;
+        .host {
+            background: #ffd700;
+            color: black;
+            border: 2px solid #b8860b;
         }
 
-        .btn-50 {
-            background-color: #ff9999;
-        }
-
-        /* Red chip style */
-        .btn-100 {
-            background-color: #99ccff;
-        }
-
-        /* Blue chip style */
-        .btn-win {
-            background-color: #ffd700;
-            border: 2px solid #fff;
+        .player {
+            background: #333;
+            color: white;
+            border: 2px solid #555;
         }
     </style>
 </head>
 
 <body>
+    <h1 style="color:#ffd700">POKER NIGHT OS</h1>
+    <p>Choose your device role:</p>
 
-    <div id="login-screen">
-        <h1>♠️ POKER NIGHT ♦️</h1>
-        <p>Enter your name to sit at the table.</p>
-        <input type="text" id="username" placeholder="Your Name (e.g. Rohan)">
-        <br>
-        <button class="btn-join" onclick="joinGame()">JOIN TABLE</button>
-    </div>
-
-    <div id="game-screen" style="display:none;">
-        <div class="pot-container">
-            <div class="pot-label">Current Pot</div>
-            <div id="pot-amount">$0</div>
-        </div>
-
-        <div id="players-list">
-        </div>
-    </div>
-
-    <div id="controls" class="controls" style="display:none;">
-        <button class="btn btn-10" onclick="placeBet(10)">+10</button>
-        <button class="btn btn-50" onclick="placeBet(50)">+50</button>
-        <button class="btn btn-100" onclick="placeBet(100)">+100</button>
-        <button class="btn btn-win" onclick="winPot()">WIN POT</button>
-    </div>
-
-    <script type="module">
-        // We use the CDN links so you don't need to install anything!
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, update, onValue, get }
-            from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-        // YOUR CONFIGURATION (I pasted it here for you)
-        const firebaseConfig = {
-            apiKey: "AIzaSyApDemI7Jtd76lOo1oPBmHneMb4mHCMxZs",
-            authDomain: "poker-night-app-dffc6.firebaseapp.com",
-            databaseURL: "https://poker-night-app-dffc6-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "poker-night-app-dffc6",
-            storageBucket: "poker-night-app-dffc6.firebasestorage.app",
-            messagingSenderId: "304292154404",
-            appId: "1:304292154404:web:c1d94e60add9a8f0d75cb1"
-        };
-
-        // Start the Engine
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-
-        let myName = "";
-
-        // --- FUNCTION 1: JOIN GAME ---
-        window.joinGame = function () {
-            const inputName = document.getElementById('username').value.trim();
-            if (!inputName) return alert("Please enter a name!");
-
-            myName = inputName; // Save my name locally
-
-            // Check if player exists, if not create them
-            const playerRef = ref(db, 'players/' + myName);
-            get(playerRef).then((snapshot) => {
-                if (!snapshot.exists()) {
-                    // New Player: Give them 1000 chips
-                    update(ref(db), {
-                        [`players/${myName}`]: { chips: 1000, currentBet: 0 }
-                    });
-                }
-                // Switch to Game Screen
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('game-screen').style.display = 'block';
-                document.getElementById('controls').style.display = 'flex';
-            });
-        }
-
-        // --- FUNCTION 2: PLACE BET ---
-        window.placeBet = function (amount) {
-            // We need to read the current state first to do math
-            get(ref(db)).then((snapshot) => {
-                const data = snapshot.val() || {};
-                const player = data.players[myName];
-                const currentPot = data.pot || 0;
-
-                if (player.chips >= amount) {
-                    const updates = {};
-                    updates[`players/${myName}/chips`] = player.chips - amount;
-                    updates[`players/${myName}/currentBet`] = (player.currentBet || 0) + amount;
-                    updates['pot'] = currentPot + amount;
-
-                    update(ref(db), updates);
-                } else {
-                    alert("You don't have enough chips!");
-                }
-            });
-        }
-
-        // --- FUNCTION 3: WIN THE POT ---
-        window.winPot = function () {
-            if (!confirm("Are you sure you won this hand?")) return;
-
-            get(ref(db)).then((snapshot) => {
-                const data = snapshot.val();
-                const pot = data.pot || 0;
-                if (pot === 0) return;
-
-                const updates = {};
-                // Give pot to winner
-                updates[`players/${myName}/chips`] = data.players[myName].chips + pot;
-                // Reset Pot
-                updates['pot'] = 0;
-                // Reset everyone's "current bet" for next round
-                Object.keys(data.players).forEach(key => {
-                    updates[`players/${key}/currentBet`] = 0;
-                });
-
-                update(ref(db), updates);
-            });
-        }
-
-        // --- FUNCTION 4: LISTEN FOR UPDATES (The Magic) ---
-        // This runs automatically whenever the database changes
-        const dbRef = ref(db);
-        onValue(dbRef, (snapshot) => {
-            const data = snapshot.val();
-            if (!data) return;
-
-            // Update Pot
-            document.getElementById('pot-amount').innerText = "$" + (data.pot || 0);
-
-            // Update List
-            const list = document.getElementById('players-list');
-            list.innerHTML = ""; // Clear current list
-
-            if (data.players) {
-                Object.keys(data.players).forEach(name => {
-                    const p = data.players[name];
-                    const isMe = (name === myName) ? " (You)" : "";
-
-                    // Create the HTML card
-                    const div = document.createElement('div');
-                    div.className = "player-card";
-                    if (name === myName) div.style.border = "2px solid #ffd700"; // Highlight me
-
-                    div.innerHTML = `
-                        <div class="p-info">
-                            <span class="p-name">${name}${isMe}</span>
-                            <span class="p-bet">Bet this round: $${p.currentBet || 0}</span>
-                        </div>
-                        <div class="p-chips">$${p.chips}</div>
-                    `;
-                    list.appendChild(div);
-                });
-            }
-        });
-    </script>
+    <a href="host.html" class="btn host">📺 OPEN HOST (iPad)</a>
+    <a href="player.html" class="btn player">📱 OPEN PLAYER (Phone)</a>
 </body>
 
 </html>
