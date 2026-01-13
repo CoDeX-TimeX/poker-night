@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poker Host VIP</title>
+    <style>
+        body {
+            margin: 0;
+            background: radial-gradient(circle at center, #35654d 0%, #0f2018 100%);
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER */
+        .admin-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            pointer-events: none;
+            box-sizing: border-box;
+        }
+
+        .room-tag {
+            font-weight: bold;
+            color: #aaa;
+            font-size: 18px;
+            text-shadow: 0 2px 5px black;
+        }
+
+        .controls {
+            pointer-events: auto;
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            border: none;
+            font-size: 16px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            transition: transform 0.1s;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-next {
+            background: #27ae60;
+            color: white;
+            border: 2px solid #2ecc71;
+        }
+
+        /* Green for Next Hand */
+        .btn-split {
+            background: #3498db;
+            color: white;
+            border: 2px solid #5dade2;
+        }
+
+        /* Blue for Split */
+        .btn-reset {
+            background: #c0392b;
+            color: white;
+            font-size: 12px;
+            padding: 10px;
+            opacity: 0.8;
+        }
+
+        /* Red/Small for Reset */
+
+        /* POT AREA */
+        .pot-area {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .pot-text {
+            position: absolute;
+            z-index: 20;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px 40px;
+            border-radius: 40px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        .pot-val {
+            font-size: 70px;
+            color: #ffd700;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+        }
+
+        /* CHIPS VISUAL */
+        .chip-visual {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 4px dashed rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.6);
+        }
+
+        .vc100 {
+            background: #222;
+            color: #ffd700;
+            border-color: #ffd700;
+        }
+
+        .vc25 {
+            background: #27ae60;
+            color: white;
+        }
+
+        .vc5 {
+            background: #c0392b;
+            color: white;
+        }
+
+        .vc1 {
+            background: #ecf0f1;
+            color: #333;
+        }
+
+        /* PLAYER GRID */
+        .player-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 80px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-content: space-between;
+            z-index: 5;
+            pointer-events: none;
+            box-sizing: border-box;
+        }
+
+        .p-card {
+            pointer-events: auto;
+            background: linear-gradient(135deg, #fff 0%, #e0e0e0 100%);
+            width: 190px;
+            height: 140px;
+            border-radius: 15px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 4px solid #ccc;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        /* STATES */
+        .p-card.folded {
+            opacity: 0.5;
+            filter: grayscale(100%);
+            border-color: #444;
+            background: #222;
+            color: #888;
+            transform: scale(0.95);
+        }
+
+        .p-card.selected {
+            border-color: #3498db;
+            box-shadow: 0 0 30px #3498db;
+            transform: scale(1.05);
+        }
+
+        .p-name {
+            font-size: 22px;
+            font-weight: 800;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .folded .p-name {
+            color: #fff;
+        }
+
+        .p-chips {
+            font-size: 26px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .p-bet-badge {
+            background: #333;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .btn-win {
+            background: #f1c40f;
+            color: #000;
+            border: none;
+            padding: 6px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        /* SETUP */
+        #setup-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #111;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        input {
+            padding: 15px;
+            font-size: 20px;
+            text-align: center;
+            margin: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="setup-modal">
+        <h1 style="color:#27ae60; letter-spacing: 2px;">HOST TABLE</h1>
+        <input id="room" placeholder="Room Name">
+        <input id="pass" placeholder="Password">
+        <button onclick="startHost()"
+            style="padding:15px 40px; font-size:20px; background:#27ae60; border:none; cursor:pointer; font-weight:bold; margin-top:20px;">START
+            TABLE</button>
+    </div>
+
+    <div id="table-view" style="display:none;">
+        <div class="admin-bar">
+            <div class="room-tag">ROOM: <span id="disp-room"></span></div>
+            <div class="controls">
+                <button class="btn btn-split" onclick="toggleSplitMode()" id="btn-split">🔀 SPLIT</button>
+                <button class="btn btn-next" onclick="nextHand()">➔ NEXT HAND</button>
+                <button class="btn btn-reset" onclick="resetGame()">⚠ RESET CHIPS</button>
+            </div>
+        </div>
+
+        <div class="pot-area">
+            <div id="chip-pile"></div>
+            <div class="pot-text">
+                <div style="font-size:14px; color:#ddd; letter-spacing:2px;">TOTAL POT</div>
+                <div class="pot-val" id="disp-pot">$0</div>
+            </div>
+        </div>
+
+        <div class="player-layer" id="player-grid"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, update, onValue, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyApDemI7Jtd76lOo1oPBmHneMb4mHCMxZs",
+            authDomain: "poker-night-app-dffc6.firebaseapp.com",
+            databaseURL: "https://poker-night-app-dffc6-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "poker-night-app-dffc6",
+            storageBucket: "poker-night-app-dffc6.firebasestorage.app",
+            messagingSenderId: "304292154404",
+            appId: "1:304292154404:web:c1d94e60add9a8f0d75cb1"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        let roomID = "";
+        let splitMode = false;
+        let selectedPlayers = [];
+
+        window.startHost = function () {
+            roomID = document.getElementById('room').value.trim().toUpperCase();
+            const pass = document.getElementById('pass').value.trim();
+            if (!roomID || !pass) return alert("Enter Info");
+            update(ref(db, `games/${roomID}`), { password: pass, pot: 0 });
+            document.getElementById('setup-modal').style.display = 'none';
+            document.getElementById('table-view').style.display = 'block';
+            document.getElementById('disp-room').innerText = roomID;
+            startListener();
+        }
+
+        function startListener() {
+            onValue(ref(db, `games/${roomID}`), (snap) => {
+                const game = snap.val();
+                if (!game) return;
+
+                document.getElementById('disp-pot').innerText = "$" + (game.pot || 0);
+                renderPotChips(game.pot || 0);
+
+                const grid = document.getElementById('player-grid');
+                grid.innerHTML = "";
+                if (game.players) {
+                    Object.keys(game.players).forEach(pName => {
+                        const p = game.players[pName];
+                        const isFolded = (p.status === 'folded');
+                        const isSelected = selectedPlayers.includes(pName) ? 'selected' : '';
+
+                        let actionBtn = `<button class="btn-win" onclick="givePot('${pName}')">🏆 WINNER</button>`;
+                        if (isFolded) actionBtn = `<span style="font-size:12px; opacity:0.5">FOLDED</span>`;
+                        if (splitMode) actionBtn = ``; // Hide win buttons in split mode
+
+                        // Add Split Logic Click
+                        let clickAction = splitMode ? `onclick="handleSplitSelect('${pName}')"` : "";
+
+                        grid.innerHTML += `
+                            <div class="p-card ${isFolded ? 'folded' : ''} ${isSelected}" ${clickAction}>
+                                <div class="p-name">${pName}</div>
+                                <div class="p-chips">$${p.chips}</div>
+                                <div class="p-bet-badge">Bet: $${p.currentBet || 0}</div>
+                                ${actionBtn}
+                            </div>
+                        `;
+                    });
+                }
+            });
+        }
+
+        // --- SPLIT LOGIC ---
+        window.toggleSplitMode = function () {
+            splitMode = !splitMode;
+            selectedPlayers = [];
+            const btn = document.getElementById('btn-split');
+            if (splitMode) {
+                btn.style.background = "#e67e22";
+                btn.innerText = "DONE SELECTING";
+                alert("Tap all winning players, then click this button again.");
+            } else {
+                // Execute Distribute if players selected
+                if (selectedPlayers.length > 0) distributePot();
+                btn.style.background = "#3498db";
+                btn.innerText = "🔀 SPLIT";
+            }
+            // Trigger refresh
+            get(ref(db, `games/${roomID}`)).then(snap => { });
+        }
+
+        window.handleSplitSelect = function (name) {
+            if (selectedPlayers.includes(name)) selectedPlayers = selectedPlayers.filter(p => p !== name);
+            else selectedPlayers.push(name);
+            // Force redraw hack
+            startListener();
+        }
+
+        function distributePot() {
+            get(ref(db, `games/${roomID}`)).then(snap => {
+                const game = snap.val();
+                const share = Math.floor((game.pot || 0) / selectedPlayers.length);
+                const updates = {};
+                selectedPlayers.forEach(p => {
+                    updates[`games/${roomID}/players/${p}/chips`] = game.players[p].chips + share;
+                });
+                updates[`games/${roomID}/pot`] = 0;
+                resetBets(updates, game);
+                update(ref(db), updates);
+            });
+        }
+
+        // --- STANDARD LOGIC ---
+        window.givePot = function (name) {
+            get(ref(db, `games/${roomID}`)).then(snap => {
+                const game = snap.val();
+                if (confirm(`Give $${game.pot} to ${name}?`)) {
+                    const updates = {};
+                    updates[`games/${roomID}/players/${name}/chips`] = game.players[name].chips + game.pot;
+                    updates[`games/${roomID}/pot`] = 0;
+                    resetBets(updates, game);
+                    update(ref(db), updates);
+                }
+            });
+        }
+
+        // --- NEW: NEXT HAND VS RESET ---
+        function resetBets(updates, game) {
+            if (game.players) Object.keys(game.players).forEach(k => updates[`games/${roomID}/players/${k}/currentBet`] = 0);
+        }
+
+        window.nextHand = function () {
+            if (!confirm("Start Next Hand? (Clears Pot/Bets, Keeps Chips)")) return;
+            get(ref(db, `games/${roomID}`)).then(snap => {
+                const game = snap.val();
+                const updates = {};
+                updates[`games/${roomID}/pot`] = 0;
+                if (game.players) {
+                    Object.keys(game.players).forEach(k => {
+                        updates[`games/${roomID}/players/${k}/currentBet`] = 0;
+                        updates[`games/${roomID}/players/${k}/status`] = 'active'; // Unfold everyone
+                    });
+                }
+                update(ref(db), updates);
+            });
+        }
+
+        window.resetGame = function () {
+            if (!confirm("⚠️ FACTORY RESET? Everyone goes back to $1000?")) return;
+            get(ref(db, `games/${roomID}`)).then(snap => {
+                const game = snap.val();
+                const updates = {};
+                updates[`games/${roomID}/pot`] = 0;
+                if (game.players) {
+                    Object.keys(game.players).forEach(k => {
+                        updates[`games/${roomID}/players/${k}/chips`] = 1000;
+                        updates[`games/${roomID}/players/${k}/currentBet`] = 0;
+                        updates[`games/${roomID}/players/${k}/status`] = 'active';
+                    });
+                }
+                update(ref(db), updates);
+            });
+        }
+
+        function renderPotChips(amount) {
+            const pile = document.getElementById('chip-pile');
+            pile.innerHTML = "";
+            let remaining = amount;
+            const chips = [];
+            while (remaining >= 100) { chips.push(100); remaining -= 100; }
+            while (remaining >= 25) { chips.push(25); remaining -= 25; }
+            while (remaining >= 5) { chips.push(5); remaining -= 5; }
+            while (remaining >= 1) { chips.push(1); remaining -= 1; }
+            const max = 40; const step = Math.ceil(chips.length / max);
+            for (let i = 0; i < chips.length; i += (step > 1 ? step : 1)) {
+                const val = chips[i];
+                const d = document.createElement('div');
+                let cls = "vc1"; if (val === 5) cls = "vc5"; if (val === 25) cls = "vc25"; if (val === 100) cls = "vc100";
+                d.className = `chip-visual ${cls}`; d.innerText = val;
+                const rot = Math.random() * 360; const x = Math.random() * 120 - 60; const y = Math.random() * 120 - 60;
+                d.style.transform = `translate(${x}px, ${y}px) rotate(${rot}deg)`;
+                pile.appendChild(d);
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Poker Player VIP</title>
+    <style>
+        body {
+            margin: 0;
+            background: linear-gradient(180deg, #121212 0%, #050505 100%);
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER */
+        .header {
+            height: 60px;
+            background: #1a1a1a;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-fold {
+            background: #c0392b;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        /* FOLD OVERLAY */
+        #folded-overlay {
+            display: none;
+            position: absolute;
+            top: 60px;
+            left: 0;
+            width: 100%;
+            height: calc(100% - 60px);
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 900;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(2px);
+        }
+
+        .folded-text {
+            font-size: 40px;
+            color: #e74c3c;
+            font-weight: bold;
+            letter-spacing: 5px;
+            border: 4px solid #e74c3c;
+            padding: 10px 40px;
+            transform: rotate(-10deg);
+            margin-bottom: 20px;
+        }
+
+        .btn-unfold {
+            background: transparent;
+            border: 1px solid #777;
+            color: #aaa;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        /* MIDDLE AREA */
+        .middle-stage {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .balance-val {
+            font-size: 32px;
+            color: #2ecc71;
+            font-weight: bold;
+        }
+
+        .staging-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid #444;
+            border-radius: 15px;
+            padding: 10px 40px;
+            text-align: center;
+            min-width: 250px;
+        }
+
+        .staged-total {
+            font-size: 50px;
+            color: #ffd700;
+            font-weight: bold;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+            margin: 5px 0;
+        }
+
+        /* NEW BUTTONS */
+        .action-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+
+        .btn-push {
+            background: linear-gradient(to bottom, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(46, 204, 113, 0.3);
+        }
+
+        .btn-call {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            display: none;
+            animation: pulse 2s infinite;
+        }
+
+        .btn-clear {
+            background: transparent;
+            border: 1px solid #555;
+            color: #888;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(52, 152, 219, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(52, 152, 219, 0);
+            }
+        }
+
+        /* CHIPS */
+        .chip-dock {
+            height: 90px;
+            background: #0f0f0f;
+            border-top: 2px solid #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .chip {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            border: 4px dashed rgba(255, 255, 255, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 18px;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .chip:active {
+            transform: scale(0.9);
+            top: 2px;
+        }
+
+        .c1 {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .c5 {
+            background: #c0392b;
+            color: white;
+        }
+
+        .c25 {
+            background: #27ae60;
+            color: white;
+        }
+
+        .c100 {
+            background: #2c3e50;
+            color: #ffd700;
+            border-color: #ffd700;
+        }
+
+        /* LOGIN */
+        #login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-input {
+            background: #222;
+            border: 1px solid #444;
+            color: #ffd700;
+            padding: 15px;
+            width: 60%;
+            font-size: 18px;
+            text-align: center;
+            margin: 10px;
+            border-radius: 8px;
+        }
+
+        .login-btn {
+            background: #ffd700;
+            color: #000;
+            border: none;
+            padding: 15px 40px;
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="login-screen">
+        <h1 style="color:#ffd700; letter-spacing:3px;">POKER LOGIN</h1>
+        <input id="room" class="login-input" placeholder="Room (e.g. TABLE1)">
+        <input id="pass" class="login-input" type="number" placeholder="Password">
+        <input id="name" class="login-input" placeholder="Your Name">
+        <button class="login-btn" onclick="joinGame()">ENTER TABLE</button>
+    </div>
+
+    <div id="folded-overlay">
+        <div class="folded-text">FOLDED</div>
+        <button class="btn-unfold" onclick="unfold()">Wait no, Undo!</button>
+    </div>
+
+    <div id="app-interface" style="display:none; height:100%; flex-direction:column;">
+        <div class="header">
+            <button class="btn-fold" onclick="foldHand()">✖ FOLD</button>
+            <div id="disp-name" style="color:#aaa; font-weight:bold;">PLAYER</div>
+        </div>
+
+        <div class="middle-stage">
+            <div style="font-size:12px; color:#666; margin-bottom:5px;">MY WALLET</div>
+            <div class="balance-val" id="disp-bal">$1000</div>
+
+            <div class="staging-box">
+                <div style="font-size:12px; color:#aaa;">ADDING TO POT</div>
+                <div class="staged-total" id="staged-val">$0</div>
+
+                <div class="action-row">
+                    <button class="btn-clear" onclick="clearStage()">CLR</button>
+                    <button class="btn-call" id="btn-call" onclick="matchCall()">CALL $0</button>
+                    <button class="btn-push" onclick="pushToPot()">BET</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="chip-dock">
+            <div class="chip c1" onclick="addChip(1)">1</div>
+            <div class="chip c5" onclick="addChip(5)">5</div>
+            <div class="chip c25" onclick="addChip(25)">25</div>
+            <div class="chip c100" onclick="addChip(100)">100</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, update, onValue, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyApDemI7Jtd76lOo1oPBmHneMb4mHCMxZs",
+            authDomain: "poker-night-app-dffc6.firebaseapp.com",
+            databaseURL: "https://poker-night-app-dffc6-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "poker-night-app-dffc6",
+            storageBucket: "poker-night-app-dffc6.firebasestorage.app",
+            messagingSenderId: "304292154404",
+            appId: "1:304292154404:web:c1d94e60add9a8f0d75cb1"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        let roomID = "", myName = "", currentBalance = 1000, stagedAmount = 0;
+        let myCurrentBet = 0, highestBet = 0;
+
+        window.joinGame = function () {
+            roomID = document.getElementById('room').value.trim().toUpperCase();
+            const pass = document.getElementById('pass').value.trim();
+            myName = document.getElementById('name').value.trim();
+            if (!roomID || !pass || !myName) return alert("Fill all fields");
+
+            get(ref(db, `games/${roomID}`)).then(snap => {
+                if (snap.exists() && String(snap.val().password) === pass) {
+                    initPlayer();
+                } else { alert("Wrong Room or Password!"); }
+            });
+        }
+
+        function initPlayer() {
+            const myRef = ref(db, `games/${roomID}/players/${myName}`);
+            // Force active
+            update(myRef, { status: 'active' });
+            get(myRef).then(snap => {
+                if (!snap.exists()) update(myRef, { chips: 1000, currentBet: 0, status: 'active' });
+            });
+
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-interface').style.display = 'flex';
+            document.getElementById('disp-name').innerText = myName;
+
+            // 1. Listen to ME (Balance/Status)
+            onValue(myRef, (s) => {
+                const data = s.val();
+                if (data) {
+                    currentBalance = data.chips;
+                    myCurrentBet = data.currentBet || 0;
+                    document.getElementById('disp-bal').innerText = "$" + currentBalance;
+
+                    // Fold Overlay
+                    const overlay = document.getElementById('folded-overlay');
+                    if (data.status === 'folded') overlay.style.display = 'flex';
+                    else overlay.style.display = 'none';
+                }
+            });
+
+            // 2. Listen to ROOM (To calculate Calls)
+            onValue(ref(db, `games/${roomID}/players`), (s) => {
+                const players = s.val() || {};
+                let max = 0;
+                Object.values(players).forEach(p => {
+                    if ((p.currentBet || 0) > max) max = p.currentBet;
+                });
+                highestBet = max;
+                updateCallButton();
+            });
+        }
+
+        function updateCallButton() {
+            const diff = highestBet - myCurrentBet;
+            const btn = document.getElementById('btn-call');
+
+            // Only show call button if there is a difference AND we haven't already staged enough
+            if (diff > 0 && stagedAmount < diff) {
+                btn.style.display = 'block';
+                btn.innerText = `CALL $${diff}`;
+                // Store the needed amount in a data attribute
+                btn.dataset.needed = diff;
+            } else {
+                btn.style.display = 'none';
+            }
+        }
+
+        window.matchCall = function () {
+            const diff = parseInt(document.getElementById('btn-call').dataset.needed || 0);
+            if (diff > 0) {
+                // If we already staged some, just add the difference
+                const toAdd = diff - stagedAmount;
+                addChip(toAdd);
+            }
+        }
+
+        window.addChip = function (amt) {
+            if (stagedAmount + amt > currentBalance) return alert("ALL IN! You don't have enough chips.");
+            stagedAmount += amt;
+            document.getElementById('staged-val').innerText = "$" + stagedAmount;
+            updateCallButton(); // Re-check if we covered the call
+        }
+
+        window.clearStage = function () {
+            stagedAmount = 0;
+            document.getElementById('staged-val').innerText = "$0";
+            updateCallButton();
+        }
+
+        window.pushToPot = function () {
+            if (stagedAmount === 0) return;
+            // Double check safety
+            if (stagedAmount > currentBalance) return alert("Not enough chips!");
+
+            get(ref(db, `games/${roomID}`)).then(snap => {
+                const game = snap.val();
+                const updates = {};
+                updates[`games/${roomID}/players/${myName}/chips`] = currentBalance - stagedAmount;
+                updates[`games/${roomID}/players/${myName}/currentBet`] = myCurrentBet + stagedAmount;
+                updates[`games/${roomID}/pot`] = (game.pot || 0) + stagedAmount;
+                update(ref(db), updates);
+
+                stagedAmount = 0;
+                document.getElementById('staged-val').innerText = "$0";
+            });
+        }
+
+        window.foldHand = function () {
+            if (confirm("Fold this hand?")) {
+                update(ref(db, `games/${roomID}/players/${myName}`), { status: 'folded' });
+            }
+        }
+
+        window.unfold = function () {
+            update(ref(db, `games/${roomID}/players/${myName}`), { status: 'active' });
+        }
+    </script>
+</body>
+
+</html>
