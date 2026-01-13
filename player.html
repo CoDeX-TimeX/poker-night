@@ -1,270 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Poker Player VIP</title>
     <style>
+        /* --- CORE STYLES --- */
         body {
-            margin: 0;
+            margin: 0; 
             background: linear-gradient(180deg, #121212 0%, #050505 100%);
-            color: white;
+            color: white; 
             font-family: 'Segoe UI', sans-serif;
+            /* FIX FOR MOBILE BROWSERS: Use dynamic viewport height */
             height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-            display: flex;
+            height: 100dvh; 
+            width: 100vw; 
+            overflow: hidden; 
+            display: flex; 
             flex-direction: column;
         }
 
         /* HEADER */
         .header {
-            height: 60px;
-            background: #1a1a1a;
-            border-bottom: 1px solid #333;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            height: 60px; 
+            background: #1a1a1a; 
+            border-bottom: 1px solid #333; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 0 20px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            flex-shrink: 0; /* Prevent header from shrinking */
         }
-
-        .btn-fold {
-            background: #c0392b;
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-        }
+        .btn-fold { background: #c0392b; color: white; border: none; padding: 8px 20px; border-radius: 5px; font-weight: bold; }
 
         /* FOLD OVERLAY */
-        #folded-overlay {
-            display: none;
-            position: absolute;
-            top: 60px;
-            left: 0;
-            width: 100%;
-            height: calc(100% - 60px);
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 900;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(2px);
-        }
-
-        .folded-text {
-            font-size: 40px;
-            color: #e74c3c;
-            font-weight: bold;
-            letter-spacing: 5px;
-            border: 4px solid #e74c3c;
-            padding: 10px 40px;
-            transform: rotate(-10deg);
-            margin-bottom: 20px;
-        }
-
-        .btn-unfold {
-            background: transparent;
-            border: 1px solid #777;
-            color: #aaa;
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-        }
+        #folded-overlay { display: none; position: absolute; top: 60px; left: 0; width: 100%; height: calc(100% - 60px); background: rgba(0,0,0,0.85); z-index: 900; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
+        .folded-text { font-size: 40px; color: #e74c3c; font-weight: bold; letter-spacing: 5px; border: 4px solid #e74c3c; padding: 10px 40px; transform: rotate(-10deg); margin-bottom: 20px; }
+        .btn-unfold { background: transparent; border: 1px solid #777; color: #aaa; padding: 10px 20px; border-radius: 20px; cursor: pointer; }
 
         /* MIDDLE AREA */
-        .middle-stage {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
+        .middle-stage { 
+            flex-grow: 1; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            position: relative; 
+            overflow-y: auto; /* Allow scrolling if screen is too small */
         }
-
-        .balance-val {
-            font-size: 32px;
-            color: #2ecc71;
-            font-weight: bold;
-        }
-
-        .staging-box {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid #444;
-            border-radius: 15px;
-            padding: 10px 40px;
-            text-align: center;
-            min-width: 250px;
-        }
-
-        .staged-total {
-            font-size: 50px;
-            color: #ffd700;
-            font-weight: bold;
-            text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
-            margin: 5px 0;
-        }
-
-        /* NEW BUTTONS */
-        .action-row {
-            display: flex;
-            gap: 10px;
+        .balance-val { font-size: 32px; color: #2ecc71; font-weight: bold; }
+        
+        .staging-box { 
+            background: rgba(255, 255, 255, 0.05); 
+            border: 2px solid #444; 
+            border-radius: 15px; 
+            padding: 10px 40px; 
+            text-align: center; 
+            min-width: 250px; 
             margin-top: 10px;
-            justify-content: center;
         }
+        .staged-total { font-size: 50px; color: #ffd700; font-weight: bold; text-shadow: 0 0 15px rgba(255, 215, 0, 0.4); margin: 5px 0; }
+        
+        /* NEW BUTTONS */
+        .action-row { display: flex; gap: 10px; margin-top: 10px; justify-content: center; }
+        .btn-push { background: linear-gradient(to bottom, #2ecc71, #27ae60); color: white; border: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold; box-shadow: 0 0 10px rgba(46, 204, 113, 0.3); }
+        .btn-call { background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; display: none; animation: pulse 2s infinite; }
+        .btn-clear { background: transparent; border: 1px solid #555; color: #888; padding: 10px 15px; border-radius: 5px; font-size: 12px; }
 
-        .btn-push {
-            background: linear-gradient(to bottom, #2ecc71, #27ae60);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: bold;
-            box-shadow: 0 0 10px rgba(46, 204, 113, 0.3);
-        }
-
-        .btn-call {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            display: none;
-            animation: pulse 2s infinite;
-        }
-
-        .btn-clear {
-            background: transparent;
-            border: 1px solid #555;
-            color: #888;
-            padding: 10px 15px;
-            border-radius: 5px;
-            font-size: 12px;
-        }
-
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7);
-            }
-
-            70% {
-                box-shadow: 0 0 0 10px rgba(52, 152, 219, 0);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(52, 152, 219, 0);
-            }
-        }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(52, 152, 219, 0); } 100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); } }
 
         /* CHIPS */
-        .chip-dock {
-            height: 90px;
-            background: #0f0f0f;
-            border-top: 2px solid #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
+        .chip-dock { 
+            height: 100px; /* Slightly taller */
+            background: #0f0f0f; 
+            border-top: 2px solid #333; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 15px; 
+            flex-shrink: 0; /* Prevent chips from being squished */
+            padding-bottom: 20px; /* LIFT UP from bottom edge */
         }
-
-        .chip {
-            width: 65px;
-            height: 65px;
-            border-radius: 50%;
-            border: 4px dashed rgba(255, 255, 255, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: bold;
-            font-size: 18px;
-            cursor: pointer;
-            position: relative;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-        }
-
-        .chip:active {
-            transform: scale(0.9);
-            top: 2px;
-        }
-
-        .c1 {
-            background: #e0e0e0;
-            color: #333;
-        }
-
-        .c5 {
-            background: #c0392b;
-            color: white;
-        }
-
-        .c25 {
-            background: #27ae60;
-            color: white;
-        }
-
-        .c100 {
-            background: #2c3e50;
-            color: #ffd700;
-            border-color: #ffd700;
-        }
+        .chip { width: 65px; height: 65px; border-radius: 50%; border: 4px dashed rgba(255,255,255,0.7); display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 18px; cursor: pointer; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .chip:active { transform: scale(0.9); top: 2px; }
+        .c1 { background: #e0e0e0; color: #333; } .c5 { background: #c0392b; color: white; } .c25 { background: #27ae60; color: white; } .c100 { background: #2c3e50; color: #ffd700; border-color: #ffd700; }
 
         /* LOGIN */
-        #login-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .login-input {
-            background: #222;
-            border: 1px solid #444;
-            color: #ffd700;
-            padding: 15px;
-            width: 60%;
-            font-size: 18px;
-            text-align: center;
-            margin: 10px;
-            border-radius: 8px;
-        }
-
-        .login-btn {
-            background: #ffd700;
-            color: #000;
-            border: none;
-            padding: 15px 40px;
-            font-size: 20px;
-            font-weight: bold;
-            margin-top: 20px;
-            border-radius: 8px;
-        }
+        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .login-input { background: #222; border: 1px solid #444; color: #ffd700; padding: 15px; width: 60%; font-size: 18px; text-align: center; margin: 10px; border-radius: 8px; }
+        .login-btn { background: #ffd700; color: #000; border: none; padding: 15px 40px; font-size: 20px; font-weight: bold; margin-top: 20px; border-radius: 8px; }
 
         /* INFO BADGE */
-        .info-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 12px;
-            color: #aaa;
-        }
+        .info-badge { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 5px; font-size: 12px; color: #aaa; }
     </style>
 </head>
-
 <body>
 
     <div id="login-screen">
@@ -295,7 +125,7 @@
             <div class="staging-box">
                 <div style="font-size:12px; color:#aaa;">ADDING TO POT</div>
                 <div class="staged-total" id="staged-val">$0</div>
-
+                
                 <div class="action-row">
                     <button class="btn-clear" onclick="clearStage()">CLR</button>
                     <button class="btn-call" id="btn-call" onclick="matchCall()">CALL $0</button>
@@ -331,14 +161,14 @@
         let roomID = "", myName = "", currentBalance = 1000, stagedAmount = 0;
         let myCurrentBet = 0, highestBet = 0;
 
-        window.joinGame = function () {
+        window.joinGame = function() {
             roomID = document.getElementById('room').value.trim().toUpperCase();
             const pass = document.getElementById('pass').value.trim();
             myName = document.getElementById('name').value.trim();
-            if (!roomID || !pass || !myName) return alert("Fill all fields");
+            if(!roomID || !pass || !myName) return alert("Fill all fields");
 
             get(ref(db, `games/${roomID}`)).then(snap => {
-                if (snap.exists() && String(snap.val().password) === pass) {
+                if(snap.exists() && String(snap.val().password) === pass) {
                     initPlayer();
                 } else { alert("Wrong Room or Password!"); }
             });
@@ -349,7 +179,7 @@
             // Force active
             update(myRef, { status: 'active' });
             get(myRef).then(snap => {
-                if (!snap.exists()) update(myRef, { chips: 1000, currentBet: 0, status: 'active' });
+                if(!snap.exists()) update(myRef, { chips: 1000, currentBet: 0, status: 'active' });
             });
 
             document.getElementById('login-screen').style.display = 'none';
@@ -359,14 +189,14 @@
             // 1. Listen to ME (Balance/Status)
             onValue(myRef, (s) => {
                 const data = s.val();
-                if (data) {
+                if(data) {
                     currentBalance = data.chips;
                     myCurrentBet = data.currentBet || 0;
                     document.getElementById('disp-bal').innerText = "$" + currentBalance;
-
+                    
                     // Fold Overlay
                     const overlay = document.getElementById('folded-overlay');
-                    if (data.status === 'folded') overlay.style.display = 'flex';
+                    if(data.status === 'folded') overlay.style.display = 'flex';
                     else overlay.style.display = 'none';
 
                     updateCallButton(); // Update when my data changes
@@ -378,7 +208,7 @@
                 const players = s.val() || {};
                 let max = 0;
                 Object.values(players).forEach(p => {
-                    if ((p.currentBet || 0) > max) max = p.currentBet;
+                    if((p.currentBet || 0) > max) max = p.currentBet;
                 });
                 highestBet = max;
                 updateCallButton();
@@ -391,7 +221,7 @@
             const infoBadge = document.getElementById('call-info');
 
             // Update info badge
-            if (diff > 0) {
+            if(diff > 0) {
                 infoBadge.innerText = `Bet to match: $${highestBet}`;
                 infoBadge.style.color = '#f39c12';
             } else {
@@ -399,58 +229,49 @@
                 infoBadge.style.color = '#aaa';
             }
 
-            // Show CALL button only if there's something to call AND we haven't staged enough
-            if (diff > 0 && stagedAmount < diff) {
+            // Only show call button if there is a difference AND we haven't already staged enough
+            if(diff > 0 && stagedAmount < diff) {
                 btn.style.display = 'block';
                 btn.innerText = `CALL $${diff}`;
+                // Store the needed amount in a data attribute
                 btn.dataset.needed = diff;
             } else {
                 btn.style.display = 'none';
             }
         }
 
-        window.matchCall = function () {
+        window.matchCall = function() {
             const diff = parseInt(document.getElementById('btn-call').dataset.needed || 0);
-            if (diff === 0) return;
-            
-            // Check if we can afford it
-            if (diff > currentBalance) {
-                // All-in scenario
-                stagedAmount = currentBalance;
-                alert("ALL IN! You're betting everything you have.");
-            } else {
-                stagedAmount = diff;
+            if(diff > 0) {
+                const toAdd = diff - stagedAmount;
+                if(stagedAmount + toAdd > currentBalance) {
+                     alert("ALL IN! You are betting your whole stack.");
+                     stagedAmount = currentBalance;
+                } else {
+                     stagedAmount += toAdd;
+                }
+                document.getElementById('staged-val').innerText = "$" + stagedAmount;
+                updateCallButton();
             }
-            
-            document.getElementById('staged-val').innerText = "$" + stagedAmount;
-            updateCallButton();
         }
 
-        window.addChip = function (amt) {
-            // Check if adding this would exceed balance
-            if (stagedAmount + amt > currentBalance) {
-                alert("Not enough chips! You only have $" + currentBalance);
-                return;
-            }
+        window.addChip = function(amt) {
+            if(stagedAmount + amt > currentBalance) return alert("ALL IN! You don't have enough chips.");
             stagedAmount += amt;
             document.getElementById('staged-val').innerText = "$" + stagedAmount;
-            updateCallButton();
+            updateCallButton(); // Re-check if we covered the call
         }
 
-        window.clearStage = function () {
+        window.clearStage = function() {
             stagedAmount = 0;
             document.getElementById('staged-val').innerText = "$0";
             updateCallButton();
         }
 
-        window.pushToPot = function () {
-            if (stagedAmount === 0) return alert("Stage some chips first!");
-            
-            // Final safety check
-            if (stagedAmount > currentBalance) {
-                alert("Error: Not enough chips!");
-                return;
-            }
+        window.pushToPot = function() {
+            if(stagedAmount === 0) return;
+            // Double check safety
+            if(stagedAmount > currentBalance) return alert("Not enough chips!");
 
             get(ref(db, `games/${roomID}`)).then(snap => {
                 const game = snap.val();
@@ -459,22 +280,21 @@
                 updates[`games/${roomID}/players/${myName}/currentBet`] = myCurrentBet + stagedAmount;
                 updates[`games/${roomID}/pot`] = (game.pot || 0) + stagedAmount;
                 update(ref(db), updates);
-
+                
                 stagedAmount = 0;
                 document.getElementById('staged-val').innerText = "$0";
             });
         }
 
-        window.foldHand = function () {
-            if (confirm("Fold this hand?")) {
+        window.foldHand = function() {
+            if(confirm("Fold this hand?")) {
                 update(ref(db, `games/${roomID}/players/${myName}`), { status: 'folded' });
             }
         }
-
-        window.unfold = function () {
+        
+        window.unfold = function() {
             update(ref(db, `games/${roomID}/players/${myName}`), { status: 'active' });
         }
     </script>
 </body>
-
 </html>
