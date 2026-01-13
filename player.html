@@ -250,6 +250,18 @@
             margin-top: 20px;
             border-radius: 8px;
         }
+
+        /* INFO BADGE */
+        .info-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            color: #aaa;
+        }
     </style>
 </head>
 
@@ -275,6 +287,8 @@
         </div>
 
         <div class="middle-stage">
+            <div class="info-badge" id="call-info">Bet to match: $0</div>
+            
             <div style="font-size:12px; color:#666; margin-bottom:5px;">MY WALLET</div>
             <div class="balance-val" id="disp-bal">$1000</div>
 
@@ -354,6 +368,8 @@
                     const overlay = document.getElementById('folded-overlay');
                     if (data.status === 'folded') overlay.style.display = 'flex';
                     else overlay.style.display = 'none';
+
+                    updateCallButton(); // Update when my data changes
                 }
             });
 
@@ -372,12 +388,21 @@
         function updateCallButton() {
             const diff = highestBet - myCurrentBet;
             const btn = document.getElementById('btn-call');
+            const infoBadge = document.getElementById('call-info');
 
-            // Only show call button if there is a difference AND we haven't already staged enough
+            // Update info badge
+            if (diff > 0) {
+                infoBadge.innerText = `Bet to match: $${highestBet}`;
+                infoBadge.style.color = '#f39c12';
+            } else {
+                infoBadge.innerText = `Bet to match: $0`;
+                infoBadge.style.color = '#aaa';
+            }
+
+            // Show CALL button only if there's something to call AND we haven't staged enough
             if (diff > 0 && stagedAmount < diff) {
                 btn.style.display = 'block';
                 btn.innerText = `CALL $${diff}`;
-                // Store the needed amount in a data attribute
                 btn.dataset.needed = diff;
             } else {
                 btn.style.display = 'none';
@@ -386,18 +411,30 @@
 
         window.matchCall = function () {
             const diff = parseInt(document.getElementById('btn-call').dataset.needed || 0);
-            if (diff > 0) {
-                // If we already staged some, just add the difference
-                const toAdd = diff - stagedAmount;
-                addChip(toAdd);
+            if (diff === 0) return;
+            
+            // Check if we can afford it
+            if (diff > currentBalance) {
+                // All-in scenario
+                stagedAmount = currentBalance;
+                alert("ALL IN! You're betting everything you have.");
+            } else {
+                stagedAmount = diff;
             }
+            
+            document.getElementById('staged-val').innerText = "$" + stagedAmount;
+            updateCallButton();
         }
 
         window.addChip = function (amt) {
-            if (stagedAmount + amt > currentBalance) return alert("ALL IN! You don't have enough chips.");
+            // Check if adding this would exceed balance
+            if (stagedAmount + amt > currentBalance) {
+                alert("Not enough chips! You only have $" + currentBalance);
+                return;
+            }
             stagedAmount += amt;
             document.getElementById('staged-val').innerText = "$" + stagedAmount;
-            updateCallButton(); // Re-check if we covered the call
+            updateCallButton();
         }
 
         window.clearStage = function () {
@@ -407,9 +444,13 @@
         }
 
         window.pushToPot = function () {
-            if (stagedAmount === 0) return;
-            // Double check safety
-            if (stagedAmount > currentBalance) return alert("Not enough chips!");
+            if (stagedAmount === 0) return alert("Stage some chips first!");
+            
+            // Final safety check
+            if (stagedAmount > currentBalance) {
+                alert("Error: Not enough chips!");
+                return;
+            }
 
             get(ref(db, `games/${roomID}`)).then(snap => {
                 const game = snap.val();
