@@ -3,11 +3,16 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Poker Night VIP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Poker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/variables.css">
+    <link rel="stylesheet" href="styles/components.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@400;700&display=swap');
-
         * {
             margin: 0;
             padding: 0;
@@ -15,145 +20,258 @@
         }
 
         body {
-            background: #1a5a3a;
-            background-image: 
-                repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,.05) 2px, rgba(0,0,0,.05) 4px),
-                repeating-linear-gradient(-45deg, transparent, transparent 2px, rgba(0,0,0,.05) 2px, rgba(0,0,0,.05) 4px),
-                radial-gradient(circle at center, #2d6a4f 0%, #0d2818 100%);
-            color: white;
-            font-family: 'Roboto', sans-serif;
-            height: 100vh;
+            font-family: var(--font-body);
+            background: linear-gradient(135deg, var(--color-felt-dark) 0%, var(--color-felt-base) 50%, var(--color-felt-dark) 100%);
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            text-align: center;
-            overflow: hidden;
+            justify-content: center;
+            color: var(--color-text-primary);
             position: relative;
+            overflow: hidden;
         }
 
-        /* Felt Texture */
+        /* Felt texture */
         body::before {
             content: '';
             position: absolute;
-            inset: 0;
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-            opacity: 0.4;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                repeating-linear-gradient(0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.05) 2px,
+                    rgba(0, 0, 0, 0.05) 4px),
+                repeating-linear-gradient(90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.05) 2px,
+                    rgba(0, 0, 0, 0.05) 4px);
             pointer-events: none;
+            opacity: 0.6;
         }
 
-        /* Wood Border */
-        .wood-border {
-            position: absolute;
-            inset: 0;
-            border: 20px solid transparent;
-            border-image: linear-gradient(135deg, #4a2511 0%, #2d1507 50%, #654321 100%) 30;
+        /* Wood border */
+        .wood-frame {
+            position: fixed;
             pointer-events: none;
-            z-index: 10;
+            z-index: 100;
         }
 
-        h1 {
-            color: #ffd700;
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 72px;
-            letter-spacing: 5px;
-            margin-bottom: 10px;
-            text-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            z-index: 20;
-            position: relative;
+        .wood-frame.top,
+        .wood-frame.bottom {
+            left: 0;
+            right: 0;
+            height: 35px;
+            background:
+                linear-gradient(90deg,
+                    #3d2817 0%,
+                    #5a3a20 20%,
+                    #6b4423 40%,
+                    #5a3a20 60%,
+                    #6b4423 80%,
+                    #3d2817 100%);
+            box-shadow:
+                inset 0 2px 6px rgba(255, 255, 255, 0.15),
+                inset 0 -2px 6px rgba(0, 0, 0, 0.5),
+                0 4px 12px rgba(0, 0, 0, 0.7);
         }
 
-        h1 span {
-            display: block;
-            font-size: 30px;
-            color: #2ecc71;
-            letter-spacing: 10px;
-            margin-top: 5px;
+        .wood-frame.top {
+            top: 0;
+        }
+
+        .wood-frame.bottom {
+            bottom: 0;
+        }
+
+        .wood-frame.left,
+        .wood-frame.right {
+            top: 0;
+            bottom: 0;
+            width: 35px;
+            background:
+                linear-gradient(180deg,
+                    #3d2817 0%,
+                    #5a3a20 20%,
+                    #6b4423 40%,
+                    #5a3a20 60%,
+                    #6b4423 80%,
+                    #3d2817 100%);
+            box-shadow:
+                inset 2px 0 6px rgba(255, 255, 255, 0.15),
+                inset -2px 0 6px rgba(0, 0, 0, 0.5),
+                4px 0 12px rgba(0, 0, 0, 0.7);
+        }
+
+        .wood-frame.left {
+            left: 0;
+        }
+
+        .wood-frame.right {
+            right: 0;
         }
 
         .container {
+            text-align: center;
+            z-index: 10;
+            padding: 60px 20px;
+        }
+
+        .logo {
+            margin-bottom: 30px;
+            font-size: 5rem;
+            filter: drop-shadow(0 0 25px rgba(255, 215, 0, 0.4));
+            animation: gentlePulse 3s ease-in-out infinite;
+        }
+
+        @keyframes gentlePulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.9;
+            }
+
+            50% {
+                transform: scale(1.03);
+                opacity: 1;
+            }
+        }
+
+        h1 {
+            font-family: var(--font-display);
+            font-size: clamp(3.5rem, 10vw, 7rem);
+            font-weight: var(--font-black);
+            margin-bottom: var(--space-16);
+            background: linear-gradient(135deg, var(--color-gold-base) 0%, var(--color-gold-light) 50%, var(--color-gold-base) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.08em;
             position: relative;
-            z-index: 20;
-            width: 100%;
-            max-width: 400px;
-            padding: 20px;
+            filter: drop-shadow(3px 5px 8px rgba(0, 0, 0, 0.7));
+            animation: gentleFloat 4s ease-in-out infinite;
+        }
+
+        @keyframes gentleFloat {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            align-items: center;
         }
 
         .btn {
-            display: block;
-            width: 100%;
-            padding: 25px;
-            margin: 20px 0;
-            border-radius: 15px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-4);
+            padding: var(--space-6) var(--space-16);
+            font-family: var(--font-body);
+            font-size: var(--text-2xl);
+            font-weight: var(--font-bold);
             text-decoration: none;
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 28px;
-            letter-spacing: 2px;
-            transition: all 0.2s;
+            border-radius: var(--radius-xl);
+            transition: all var(--transition-base);
+            cursor: pointer;
+            border: none;
+            min-width: 340px;
+            box-shadow: var(--shadow-xl), inset 0 1px 0 rgba(255, 255, 255, 0.15);
             position: relative;
-            border: 2px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(5px);
+            overflow: hidden;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
         }
 
-        .btn:active {
-            transform: scale(0.98) translateY(2px);
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.2),
+                    transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
         }
 
         .btn-host {
-            background: linear-gradient(145deg, #ffd700, #f39c12);
-            color: #2d1507;
-            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);
-            border-color: #ffeaa7;
+            background: linear-gradient(135deg, var(--color-danger-dark) 0%, var(--color-danger) 100%);
+            color: var(--color-white);
+        }
+
+        .btn-host:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: var(--shadow-2xl), var(--shadow-glow-red);
         }
 
         .btn-player {
-            background: linear-gradient(145deg, #2ecc71, #27ae60);
-            color: white;
-            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.3);
-            border-color: #58d68d;
+            background: linear-gradient(135deg, var(--color-success-dark) 0%, var(--color-success) 100%);
+            color: var(--color-white);
         }
 
-        .features {
-            margin-top: 40px;
-            color: rgba(255,255,255,0.6);
-            font-size: 14px;
-            line-height: 1.6;
-            letter-spacing: 1px;
-            z-index: 20;
+        .btn-player:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: var(--shadow-2xl), var(--shadow-glow-green);
         }
 
-        .icon {
-            font-size: 30px;
-            margin-right: 10px;
-            vertical-align: middle;
+        @media (max-width: 768px) {
+            .btn {
+                min-width: 280px;
+                padding: 18px 50px;
+                font-size: 1.2rem;
+            }
+
+            h1 {
+                margin-bottom: 50px;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div class="wood-border"></div>
-
-    <h1>
-        POKER VIP
-        <span>ULTIMATE EDITION</span>
-    </h1>
+    <!-- Wood frame borders -->
+    <div class="wood-frame top"></div>
+    <div class="wood-frame bottom"></div>
+    <div class="wood-frame left"></div>
+    <div class="wood-frame right"></div>
 
     <div class="container">
-        <a href="host.html" class="btn btn-host">
-            <span class="icon">📺</span> LAUNCH HOST
-            <div style="font-size: 14px; font-family: sans-serif; opacity: 0.7; letter-spacing: 0; margin-top: 5px;">For iPad / TV / Laptop</div>
-        </a>
+        <div class="logo">♠️♥️♦️♣️</div>
+        <h1>POKER</h1>
 
-        <a href="player.html" class="btn btn-player">
-            <span class="icon">📱</span> JOIN TABLE
-            <div style="font-size: 14px; font-family: sans-serif; opacity: 0.8; letter-spacing: 0; margin-top: 5px;">For Players (Phone)</div>
-        </a>
-    </div>
-
-    <div class="features">
-        🔄 Turn-Based Action • 🪑 Seat Arrangement<br>
-        🔊 Pro Sound Effects • 📳 Haptic Feedback<br>
-        💎 3D Chips & Animations
+        <div class="buttons">
+            <a href="host.html" class="btn btn-host">
+                <span>📺</span>
+                <span>OPEN HOST</span>
+            </a>
+            <a href="player.html" class="btn btn-player">
+                <span>📱</span>
+                <span>JOIN TABLE</span>
+            </a>
+        </div>
     </div>
 </body>
 
