@@ -685,6 +685,7 @@
         let isMyTurn = false;
         let seatList = [];
         let currentTurnIndex = 0;
+        let hasInitialized = false;
 
         // SOUNDS & HAPTICS
         const sounds = {
@@ -786,10 +787,20 @@
             
             const avatars = ['🃏', '♠️', '♥️', '♦️', '♣️', '🎰', '🎲', '👑'];
             document.getElementById('avatar').innerText = avatars[Math.floor(Math.random() * avatars.length)];
+            
+            hasInitialized = true;
 
             // Listen to ME
             onValue(myRef, (s) => {
                 const data = s.val();
+                
+                // CHECK IF KICKED
+                if (hasInitialized && data === null) {
+                    alert("You have been removed from the table.");
+                    location.reload();
+                    return;
+                }
+
                 if (data) {
                     currentBalance = data.chips;
                     myCurrentBet = data.currentBet || 0;
