@@ -54,14 +54,6 @@
             box-shadow: inset 0 0 30px rgba(0,0,0,0.6);
         }
 
-        .wood-rail::before {
-            content: '';
-            position: absolute;
-            inset: -30px;
-            border: 3px solid #8b4513;
-            pointer-events: none;
-        }
-
         /* HEADER */
         .admin-bar {
             position: absolute;
@@ -113,26 +105,11 @@
                         inset 0 -2px 5px rgba(0,0,0,0.3);
         }
 
-        .btn-action:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        }
-
-        .btn-newhand {
-            background: linear-gradient(145deg, #2ecc71, #27ae60);
-            color: white;
-        }
-
-        .btn-reset {
-            background: linear-gradient(145deg, #e74c3c, #c0392b);
-            color: white;
-        }
-
-        .btn-split {
-            background: linear-gradient(145deg, #3498db, #2980b9);
-            color: white;
-        }
-
+        .btn-action:active { transform: translateY(2px); }
+        .btn-reset { background: linear-gradient(145deg, #e74c3c, #c0392b); color: white; }
+        .btn-next { background: linear-gradient(145deg, #f39c12, #d35400); color: white; }
+        .btn-split { background: linear-gradient(145deg, #3498db, #2980b9); color: white; }
+        
         .btn-distribute {
             background: linear-gradient(145deg, #ffd700, #f39c12);
             color: #000;
@@ -145,41 +122,36 @@
             50% { box-shadow: 0 4px 30px rgba(255, 215, 0, 0.8); }
         }
 
-        /* STATS BAR */
-        .stats-bar {
+        /* NOTIFICATIONS */
+        .notification-area {
             position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(15px);
-            padding: 15px 30px;
-            border-radius: 20px;
+            top: 100px;
+            right: 40px;
+            z-index: 200;
             display: flex;
-            gap: 40px;
-            z-index: 100;
-            border: 2px solid rgba(255, 215, 0, 0.2);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
         }
 
-        .stat-item {
-            text-align: center;
+        .notification {
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(15px);
+            padding: 15px 25px;
+            border-radius: 12px;
+            border: 2px solid rgba(46, 204, 113, 0.5);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+            animation: slideIn 0.3s, fadeOut 0.5s 2.5s forwards;
+            min-width: 250px;
         }
 
-        .stat-label {
-            font-size: 10px;
-            color: #888;
-            letter-spacing: 1px;
-            margin-bottom: 5px;
-        }
+        .notification.all-in { border-color: rgba(231, 76, 60, 0.8); box-shadow: 0 0 30px rgba(231, 76, 60, 0.6); }
+        .notification-name { font-size: 16px; font-weight: bold; color: #ffd700; font-family: 'Bebas Neue', sans-serif; letter-spacing: 2px; margin-bottom: 5px; }
+        .notification-bet { font-size: 24px; color: #2ecc71; font-weight: bold; font-family: 'Bebas Neue', sans-serif; }
+        .notification.all-in .notification-bet { color: #e74c3c; }
 
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: #ffd700;
-            font-family: 'Bebas Neue', sans-serif;
-            letter-spacing: 2px;
-        }
+        @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; transform: translateX(400px); } }
 
         /* POT AREA */
         .pot-area {
@@ -193,6 +165,7 @@
             justify-content: center;
             align-items: center;
             pointer-events: none;
+            z-index: 10;
         }
 
         .pot-glow {
@@ -204,14 +177,9 @@
             opacity: 0;
         }
 
-        .pot-glow.active {
-            opacity: 1;
-        }
+        .pot-glow.active { opacity: 1; }
 
-        @keyframes potPulse {
-            0%, 100% { transform: scale(0.9); opacity: 0.3; }
-            50% { transform: scale(1.1); opacity: 0.6; }
-        }
+        @keyframes potPulse { 0%, 100% { transform: scale(0.9); opacity: 0.3; } 50% { transform: scale(1.1); opacity: 0.6; } }
 
         .pot-text {
             position: absolute;
@@ -225,342 +193,172 @@
             box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
         }
 
-        .pot-label {
-            font-size: 14px;
-            color: #888;
-            letter-spacing: 3px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .pot-val {
-            font-size: 72px;
-            color: #ffd700;
-            font-weight: bold;
-            font-family: 'Bebas Neue', sans-serif;
-            text-shadow: 0 0 40px rgba(255, 215, 0, 0.8),
-                         0 4px 8px rgba(0,0,0,0.8);
-            letter-spacing: 5px;
-        }
-
-        /* DEALER BUTTON */
-        .dealer-btn {
-            position: absolute;
-            width: 50px;
-            height: 50px;
-            background: radial-gradient(circle at 30% 30%, #ffffff, #e8e8e8 60%, #c0c0c0);
-            border-radius: 50%;
-            border: 4px solid #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 20px;
-            color: #000;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.6);
-            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            z-index: 50;
-            font-family: 'Bebas Neue', sans-serif;
-        }
+        .pot-label { font-size: 14px; color: #888; letter-spacing: 3px; font-weight: bold; margin-bottom: 5px; }
+        .pot-val { font-size: 72px; color: #ffd700; font-weight: bold; font-family: 'Bebas Neue', sans-serif; text-shadow: 0 0 40px rgba(255, 215, 0, 0.8), 0 4px 8px rgba(0,0,0,0.8); letter-spacing: 5px; }
 
         /* CHIPS VISUAL */
-        #chip-pile {
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
-
+        #chip-pile { position: relative; width: 100%; height: 100%; z-index: 5; }
         .chip-visual {
-            position: absolute;
-            width: 65px;
-            height: 65px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: bold;
-            font-size: 18px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.6);
-            transition: all 0.3s;
-            font-family: 'Bebas Neue', sans-serif;
+            position: absolute; width: 65px; height: 65px; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-weight: bold; font-size: 18px; box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+            transition: all 0.3s; font-family: 'Bebas Neue', sans-serif;
         }
-
         .chip-visual::before {
-            content: '';
-            position: absolute;
-            inset: -3px;
-            border-radius: 50%;
-            padding: 3px;
-            background: repeating-conic-gradient(
-                from 0deg,
-                currentColor 0deg 18deg,
-                transparent 18deg 36deg
-            );
-            -webkit-mask: 
-                linear-gradient(#fff 0 0) content-box, 
-                linear-gradient(#fff 0 0);
-            mask: 
-                linear-gradient(#fff 0 0) content-box, 
-                linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
+            content: ''; position: absolute; inset: -3px; border-radius: 50%; padding: 3px;
+            background: repeating-conic-gradient(from 0deg, currentColor 0deg 18deg, transparent 18deg 36deg);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude;
         }
-
-        .vc100 {
-            background: radial-gradient(circle at 30% 30%, #34495e, #2c3e50 60%, #1a252f);
-            color: #ffd700;
-        }
-
-        .vc25 {
-            background: radial-gradient(circle at 30% 30%, #2ecc71, #27ae60 60%, #229954);
-            color: white;
-        }
-
-        .vc5 {
-            background: radial-gradient(circle at 30% 30%, #e74c3c, #c0392b 60%, #a93226);
-            color: white;
-        }
-
-        .vc1 {
-            background: radial-gradient(circle at 30% 30%, #ffffff, #e8e8e8 60%, #c0c0c0);
-            color: #333;
-        }
+        .vc100 { background: radial-gradient(circle at 30% 30%, #34495e, #2c3e50 60%, #1a252f); color: #ffd700; }
+        .vc25 { background: radial-gradient(circle at 30% 30%, #2ecc71, #27ae60 60%, #229954); color: white; }
+        .vc5 { background: radial-gradient(circle at 30% 30%, #e74c3c, #c0392b 60%, #a93226); color: white; }
+        .vc1 { background: radial-gradient(circle at 30% 30%, #ffffff, #e8e8e8 60%, #c0c0c0); color: #333; }
 
         /* PLAYER GRID */
         .player-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            padding: 100px 80px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-around;
-            align-content: space-between;
-            z-index: 5;
-            pointer-events: none;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            padding: 100px 80px; display: flex; flex-wrap: wrap;
+            justify-content: space-around; align-content: space-between;
+            z-index: 50; pointer-events: none;
         }
 
         .p-card {
             pointer-events: auto;
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            width: 200px;
-            height: 150px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5),
-                        inset 0 1px 0 rgba(255,255,255,0.5);
+            width: 200px; height: 160px; border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.5);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border: 3px solid #dee2e6; transition: all 0.3s; cursor: pointer; position: relative;
+        }
+
+        /* NEW: ACTIVE TURN GLOW */
+        .p-card.active-turn {
+            border-color: #2ecc71;
+            box-shadow: 0 0 50px rgba(46, 204, 113, 0.6), 0 15px 40px rgba(0, 0, 0, 0.6);
+            transform: scale(1.1);
+            z-index: 60;
+        }
+
+        /* NEW: SEAT ARROWS */
+        .seat-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            border-radius: 50%;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            border: 3px solid #dee2e6;
-            transition: all 0.3s;
             cursor: pointer;
-            position: relative;
+            border: none;
+            font-weight: bold;
+            opacity: 0; /* Hidden unless hovered */
+            transition: all 0.2s;
+            z-index: 100;
         }
+        
+        .p-card:hover .seat-arrow { opacity: 1; }
+        .seat-arrow:hover { background: #ffd700; color: black; transform: translateY(-50%) scale(1.2); }
+        .arrow-left { left: -15px; }
+        .arrow-right { right: -15px; }
 
-        .p-card:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
-        }
-
-        /* Dealer indicator */
-        .p-card.has-dealer::before {
-            content: 'D';
+        /* DEALER BUTTON */
+        .dealer-btn {
             position: absolute;
-            top: -20px;
-            right: -20px;
-            width: 40px;
-            height: 40px;
-            background: radial-gradient(circle, #ffffff, #e8e8e8);
-            border: 3px solid #000;
+            top: -15px;
+            right: -15px;
+            width: 35px;
+            height: 35px;
+            background: white;
+            border: 2px solid black;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 20px;
-            color: #000;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            font-family: 'Bebas Neue', sans-serif;
-            z-index: 10;
+            font-size: 18px;
+            color: black;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+            font-family: serif;
+            z-index: 70;
         }
 
-        /* STATE STYLES */
         .p-card.folded {
-            opacity: 0.35;
-            filter: grayscale(100%);
-            border-color: #555;
-            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
-            color: #888;
+            opacity: 0.4; filter: grayscale(100%);
+            border-color: #555; background: #333; color: #888;
         }
-
-        .p-card.folded:hover {
-            transform: none;
-        }
+        .p-card.folded.active-turn { transform: none; box-shadow: none; border-color: #555; } /* Folded players don't glow */
 
         .p-card.selected {
-            border-color: #2ecc71;
-            box-shadow: 0 0 30px rgba(46, 204, 113, 0.8),
-                        0 15px 40px rgba(0, 0, 0, 0.6);
-            transform: scale(1.08);
-        }
-
-        .p-card.winner {
-            animation: winnerGlow 1s infinite;
-        }
-
-        @keyframes winnerGlow {
-            0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.6); }
-            50% { box-shadow: 0 0 40px rgba(255, 215, 0, 1); }
+            border-color: #3498db;
+            box-shadow: 0 0 30px rgba(52, 152, 219, 0.8);
         }
 
         .p-avatar {
-            width: 45px;
-            height: 45px;
+            width: 45px; height: 45px;
             background: linear-gradient(145deg, #ffd700, #f39c12);
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            margin-bottom: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; margin-bottom: 8px;
             box-shadow: 0 3px 10px rgba(255, 215, 0, 0.5);
         }
 
-        .p-name {
-            font-size: 20px;
-            font-weight: 900;
-            color: #1a202c;
-            margin-bottom: 5px;
-            font-family: 'Bebas Neue', sans-serif;
-            letter-spacing: 1px;
-        }
+        .p-name { font-size: 20px; font-weight: 900; color: #1a202c; margin-bottom: 5px; font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px; }
+        .folded .p-name { color: #aaa; }
 
-        .folded .p-name {
-            color: #aaa;
-        }
+        .p-chips { font-size: 28px; color: #2ecc71; font-weight: bold; margin-bottom: 3px; font-family: 'Bebas Neue', sans-serif; text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
 
-        .p-chips {
-            font-size: 28px;
-            color: #2ecc71;
-            font-weight: bold;
-            margin-bottom: 3px;
-            font-family: 'Bebas Neue', sans-serif;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-        }
-
-        .p-bet {
-            font-size: 11px;
-            color: #666;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
-
-        .folded .p-bet {
-            color: #555;
-        }
+        .p-bet { font-size: 11px; color: #666; font-weight: bold; letter-spacing: 1px; }
+        .folded .p-bet { color: #555; }
 
         .btn-win {
             background: linear-gradient(145deg, #ffd700, #f39c12);
-            color: #000;
-            border: none;
-            padding: 8px 24px;
-            border-radius: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 8px;
-            font-family: 'Bebas Neue', sans-serif;
-            letter-spacing: 1px;
-            box-shadow: 0 3px 15px rgba(255, 215, 0, 0.4);
+            color: #000; border: none; padding: 6px 18px;
+            border-radius: 20px; font-weight: bold; cursor: pointer;
+            margin-top: 8px; font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 1px; box-shadow: 0 3px 15px rgba(255, 215, 0, 0.4);
             transition: all 0.2s;
         }
+        .btn-win:active { transform: scale(0.95); }
 
-        .btn-win:active {
-            transform: scale(0.95);
+        .btn-kick {
+            position: absolute; bottom: 5px; right: 5px;
+            background: none; border: none; font-size: 10px; color: #aaa; cursor: pointer;
         }
 
         /* SETUP */
         #setup-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
-            z-index: 999;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            z-index: 999; display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
         }
 
-        .setup-title {
-            color: #ffd700;
-            font-size: 64px;
-            font-family: 'Bebas Neue', sans-serif;
-            letter-spacing: 8px;
-            margin-bottom: 50px;
-            text-shadow: 0 0 40px rgba(255, 215, 0, 0.8);
-        }
+        .setup-title { color: #ffd700; font-size: 64px; font-family: 'Bebas Neue', sans-serif; letter-spacing: 8px; margin-bottom: 50px; text-shadow: 0 0 40px rgba(255, 215, 0, 0.8); }
 
         input {
-            padding: 18px 30px;
-            font-size: 22px;
-            text-align: center;
-            margin: 12px;
-            border-radius: 12px;
-            background: rgba(0,0,0,0.4);
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 215, 0, 0.3);
-            color: #ffd700;
-            width: 350px;
+            padding: 18px 30px; font-size: 22px; text-align: center; margin: 12px;
+            border-radius: 12px; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 215, 0, 0.3); color: #ffd700; width: 350px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.4);
         }
 
-        input:focus {
-            outline: none;
-            border-color: #ffd700;
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
-        }
-
         .setup-btn {
-            padding: 18px 60px;
-            font-size: 24px;
+            padding: 18px 60px; font-size: 24px;
             background: linear-gradient(145deg, #2ecc71, #27ae60);
-            border: none;
-            cursor: pointer;
-            border-radius: 12px;
-            color: white;
-            font-weight: bold;
-            margin-top: 30px;
-            font-family: 'Bebas Neue', sans-serif;
-            letter-spacing: 3px;
-            box-shadow: 0 6px 25px rgba(46, 204, 113, 0.5);
-            transition: all 0.2s;
-        }
-
-        .setup-btn:active {
-            transform: translateY(3px);
+            border: none; cursor: pointer; border-radius: 12px; color: white;
+            font-weight: bold; margin-top: 30px; font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 3px; box-shadow: 0 6px 25px rgba(46, 204, 113, 0.5);
         }
 
         /* CONFETTI */
-        .confetti {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: #ffd700;
-            pointer-events: none;
-            animation: confettiFall 2s forwards;
-        }
-
-        @keyframes confettiFall {
-            to {
-                transform: translateY(100vh) rotate(720deg);
-                opacity: 0;
-            }
-        }
+        .confetti { position: absolute; width: 10px; height: 10px; background: #ffd700; pointer-events: none; animation: confettiFall 2s forwards; }
+        @keyframes confettiFall { to { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
     </style>
 </head>
 
@@ -571,7 +369,7 @@
     <div id="setup-modal">
         <div class="setup-title">POKER HOST</div>
         <input id="room" placeholder="Room Name" autocomplete="off">
-        <input id="pass" placeholder="Password" autocomplete="off">
+        <input id="pass" placeholder="Password (any characters)" autocomplete="off">
         <button class="setup-btn" onclick="startHost()">START TABLE</button>
     </div>
 
@@ -581,12 +379,14 @@
                 ROOM: <span id="disp-room"></span>
             </div>
             <div class="controls">
-                <button class="btn-action btn-newhand" onclick="newHand()">🃏 NEW HAND</button>
-                <button class="btn-action btn-split" onclick="toggleSplitMode()">🔀 SPLIT</button>
+                <button class="btn-action btn-next" onclick="nextRound()">⏩ NEXT ROUND</button>
+                <button class="btn-action btn-split" onclick="toggleSplitMode()">🔀 SPLIT POT</button>
                 <button class="btn-action btn-distribute" id="btn-dist" onclick="distributeSplit()">💰 DISTRIBUTE</button>
-                <button class="btn-action btn-reset" onclick="resetGame()">↻ RESET</button>
+                <button class="btn-action btn-reset" onclick="resetGame()">↻ FULL RESET</button>
             </div>
         </div>
+
+        <div class="notification-area" id="notification-area"></div>
 
         <div class="pot-area">
             <div class="pot-glow" id="pot-glow"></div>
@@ -597,27 +397,12 @@
             </div>
         </div>
 
-        <div class="stats-bar">
-            <div class="stat-item">
-                <div class="stat-label">HANDS</div>
-                <div class="stat-value" id="stat-hands">0</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-label">BIGGEST</div>
-                <div class="stat-value" id="stat-biggest">$0</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-label">LEADER</div>
-                <div class="stat-value" id="stat-leader">--</div>
-            </div>
-        </div>
-
         <div class="player-layer" id="player-grid"></div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, update, onValue, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, update, onValue, get, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyApDemI7Jtd76lOo1oPBmHneMb4mHCMxZs",
@@ -634,10 +419,10 @@
         let roomID = "";
         let splitMode = false;
         let selectedPlayers = [];
+        let previousBets = {};
+        let seats = []; // Array of player names in order
         let dealerIndex = 0;
-        let playerNames = [];
-        let handsPlayed = 0;
-        let biggestPot = 0;
+        let turnIndex = 0;
 
         // AUDIO
         function playSound(frequencies, duration = 0.2) {
@@ -669,6 +454,18 @@
             }
         }
 
+        function showNotification(playerName, betAmount, isAllIn = false) {
+            const container = document.getElementById('notification-area');
+            const notification = document.createElement('div');
+            notification.className = 'notification' + (isAllIn ? ' all-in' : '');
+            notification.innerHTML = `
+                <div class="notification-name">${playerName}</div>
+                <div class="notification-bet">+$${betAmount}${isAllIn ? ' ALL IN!' : ''}</div>
+            `;
+            container.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
         window.startHost = function () {
             roomID = document.getElementById('room').value.trim().toUpperCase();
             const pass = document.getElementById('pass').value.trim();
@@ -677,8 +474,8 @@
             update(ref(db, `games/${roomID}`), { 
                 password: pass, 
                 pot: 0,
-                handsPlayed: 0,
-                biggestPot: 0
+                dealerIndex: 0,
+                turnIndex: 1
             });
             
             document.getElementById('setup-modal').style.display = 'none';
@@ -697,95 +494,130 @@
                 document.getElementById('disp-pot').innerText = "$" + potAmount;
                 renderPotChips(potAmount);
 
-                // Pot glow effect for big pots
                 const glow = document.getElementById('pot-glow');
-                if (potAmount > 200) {
-                    glow.classList.add('active');
-                } else {
-                    glow.classList.remove('active');
-                }
+                if (potAmount > 200) glow.classList.add('active');
+                else glow.classList.remove('active');
 
-                // Track biggest pot
-                if (potAmount > biggestPot) {
-                    biggestPot = potAmount;
-                    document.getElementById('stat-biggest').innerText = "$" + biggestPot;
-                }
+                // SYNC SEATS
+                const players = game.players || {};
+                const dbSeats = game.seats || [];
+                dealerIndex = game.dealerIndex || 0;
+                turnIndex = game.turnIndex || 0;
 
-                // Update stats
-                handsPlayed = game.handsPlayed || 0;
-                document.getElementById('stat-hands').innerText = handsPlayed;
-
-                const grid = document.getElementById('player-grid');
-                grid.innerHTML = "";
+                // Add new players to seats if missing
+                let seatsUpdated = false;
+                Object.keys(players).forEach(pName => {
+                    if (!dbSeats.includes(pName)) {
+                        dbSeats.push(pName);
+                        seatsUpdated = true;
+                    }
+                });
                 
-                if (game.players) {
-                    playerNames = Object.keys(game.players);
-                    
-                    // Find chip leader
-                    let leader = "";
-                    let maxChips = 0;
-                    Object.entries(game.players).forEach(([name, p]) => {
-                        if (p.chips > maxChips) {
-                            maxChips = p.chips;
-                            leader = name;
-                        }
-                    });
-                    document.getElementById('stat-leader').innerText = leader || "--";
+                // Remove players who left
+                const cleanedSeats = dbSeats.filter(name => players[name]);
+                if (cleanedSeats.length !== dbSeats.length) seatsUpdated = true;
 
-                    playerNames.forEach((pName, index) => {
-                        const p = game.players[pName];
-                        const isFolded = (p.status === 'folded');
-                        const isDealer = (index === dealerIndex);
-                        const isSelected = selectedPlayers.includes(pName) ? 'selected' : '';
-                        const foldedClass = isFolded ? 'folded' : '';
-                        const dealerClass = isDealer ? 'has-dealer' : '';
-                        const isLeader = (pName === leader && maxChips > 0);
-
-                        let winButton = `<button class="btn-win" onclick="givePot('${pName}')">🏆 WIN</button>`;
-                        if (isFolded) winButton = `<span style="font-size:11px; color:#555; font-weight:bold;">FOLDED</span>`;
-                        if (splitMode) winButton = `<span style="font-size:11px; color:#3498db; font-weight:bold;">SELECT</span>`;
-
-                        // Random avatar
-                        const avatars = ['🃏', '♠️', '♥️', '♦️', '♣️', '🎰', '🎲', '👑', '🔥', '⭐'];
-                        const avatar = avatars[index % avatars.length];
-
-                        grid.innerHTML += `
-                            <div class="p-card ${foldedClass} ${isSelected} ${dealerClass}" onclick="handleCardClick('${pName}', ${isFolded})">
-                                <div class="p-avatar">${isLeader ? '👑' : avatar}</div>
-                                <div class="p-name">${pName}</div>
-                                <div class="p-chips">$${p.chips}</div>
-                                <div class="p-bet">BET: $${p.currentBet || 0}</div>
-                                ${winButton}
-                            </div>
-                        `;
-                    });
+                if (seatsUpdated) {
+                    update(ref(db, `games/${roomID}`), { seats: cleanedSeats });
+                    return; // Wait for next update
                 }
+
+                seats = cleanedSeats; // Update local scope
+
+                // Notifications
+                Object.entries(players).forEach(([name, p]) => {
+                    const currentBet = p.currentBet || 0;
+                    const previousBet = previousBets[name] || 0;
+                    if (currentBet > previousBet) {
+                        showNotification(name, currentBet - previousBet, (p.chips === 0 && currentBet > 0));
+                    }
+                    previousBets[name] = currentBet;
+                });
+
+                renderGrid(players);
             });
         }
 
-        // NEW HAND
-        window.newHand = function () {
-            if (!confirm("Start new hand?")) return;
+        function renderGrid(players) {
+            const grid = document.getElementById('player-grid');
+            grid.innerHTML = "";
             
-            // Rotate dealer
-            if (playerNames.length > 0) {
-                dealerIndex = (dealerIndex + 1) % playerNames.length;
+            seats.forEach((pName, index) => {
+                const p = players[pName];
+                const isFolded = (p.status === 'folded');
+                const isTurn = (index === turnIndex);
+                const isDealer = (index === dealerIndex);
+                const isSelected = selectedPlayers.includes(pName) ? 'selected' : '';
+
+                let winButton = `<button class="btn-win" onclick="givePot('${pName}')">🏆 WIN</button>`;
+                if (isFolded) winButton = `<span style="font-size:11px; color:#555; font-weight:bold;">FOLDED</span>`;
+                if (splitMode) winButton = `<span style="font-size:11px; color:#3498db; font-weight:bold;">SELECT</span>`;
+
+                const avatars = ['🃏', '♠️', '♥️', '♦️', '♣️', '🎰', '🎲', '👑'];
+                const avatar = avatars[index % avatars.length];
+
+                grid.innerHTML += `
+                    <div class="p-card ${isFolded ? 'folded' : ''} ${isSelected} ${isTurn ? 'active-turn' : ''}" onclick="handleCardClick('${pName}', ${isFolded})">
+                        ${isDealer ? '<div class="dealer-btn">D</div>' : ''}
+                        
+                        <button class="seat-arrow arrow-left" onclick="swapSeat(${index}, -1, event)"><</button>
+                        
+                        <div class="p-avatar">${avatar}</div>
+                        <div class="p-name">${pName}</div>
+                        <div class="p-chips">$${p.chips}</div>
+                        <div class="p-bet">BET: $${p.currentBet || 0}</div>
+                        ${winButton}
+                        
+                        <button class="seat-arrow arrow-right" onclick="swapSeat(${index}, 1, event)">></button>
+                        <button class="btn-kick" onclick="kickPlayer('${pName}', event)">x</button>
+                    </div>
+                `;
+            });
+        }
+
+        window.swapSeat = function(currentIndex, direction, event) {
+            event.stopPropagation();
+            const targetIndex = currentIndex + direction;
+            if (targetIndex < 0 || targetIndex >= seats.length) return;
+
+            // Swap
+            const temp = seats[currentIndex];
+            seats[currentIndex] = seats[targetIndex];
+            seats[targetIndex] = temp;
+
+            update(ref(db, `games/${roomID}`), { seats: seats });
+        }
+
+        window.kickPlayer = function(name, event) {
+            event.stopPropagation();
+            if (confirm(`Kick ${name}?`)) {
+                remove(ref(db, `games/${roomID}/players/${name}`));
             }
-            
+        }
+
+        window.nextRound = function() {
+            // Rotates Dealer, Resets Bets, Clears Pot
             get(ref(db, `games/${roomID}`)).then(snap => {
                 const game = snap.val();
+                
+                // Calculate next dealer
+                const nextDealer = (dealerIndex + 1) % seats.length;
+                // Next turn is dealer + 1 (Small Blind position)
+                const nextTurn = (nextDealer + 1) % seats.length;
+
                 const updates = {};
                 updates[`games/${roomID}/pot`] = 0;
-                updates[`games/${roomID}/handsPlayed`] = (game.handsPlayed || 0) + 1;
-                
-                if (game.players) {
-                    Object.keys(game.players).forEach(k => {
-                        updates[`games/${roomID}/players/${k}/currentBet`] = 0;
-                        updates[`games/${roomID}/players/${k}/status`] = 'active';
-                    });
-                }
+                updates[`games/${roomID}/dealerIndex`] = nextDealer;
+                updates[`games/${roomID}/turnIndex`] = nextTurn;
+
+                // Reset player statuses
+                Object.keys(game.players || {}).forEach(k => {
+                    updates[`games/${roomID}/players/${k}/currentBet`] = 0;
+                    updates[`games/${roomID}/players/${k}/status`] = 'active';
+                });
+
                 update(ref(db), updates);
-                playSound([523, 659], 0.2);
+                playSound([600, 800], 0.3);
             });
         }
 
@@ -793,7 +625,6 @@
         window.toggleSplitMode = function () {
             splitMode = !splitMode;
             selectedPlayers = [];
-
             const btn = document.querySelector('.btn-split');
             const distBtn = document.getElementById('btn-dist');
 
@@ -806,80 +637,49 @@
                 btn.innerText = "🔀 SPLIT";
                 distBtn.style.display = 'none';
             }
-            get(ref(db, `games/${roomID}`)).then(snap => { });
+            renderGrid(previousBets); // Force re-render
         }
 
         window.handleCardClick = function (name, isFolded) {
             if (!splitMode || isFolded) return;
-
-            if (selectedPlayers.includes(name)) {
-                selectedPlayers = selectedPlayers.filter(p => p !== name);
-            } else {
-                selectedPlayers.push(name);
-            }
+            if (selectedPlayers.includes(name)) selectedPlayers = selectedPlayers.filter(p => p !== name);
+            else selectedPlayers.push(name);
             
+            // Toggle visual class immediately
             const cards = document.querySelectorAll('.p-card');
             cards.forEach(card => {
-                if (card.querySelector('.p-name').innerText === name) {
-                    card.classList.toggle('selected');
-                }
+                if (card.querySelector('.p-name').innerText === name) card.classList.toggle('selected');
             });
-            playSound([800], 0.1);
         }
 
         window.distributeSplit = function () {
             if (selectedPlayers.length < 2) return alert("Select at least 2 players!");
-
             get(ref(db, `games/${roomID}`)).then(snap => {
                 const game = snap.val();
                 const totalPot = game.pot || 0;
-                if (totalPot === 0) return alert("Pot is empty!");
-
                 const share = Math.floor(totalPot / selectedPlayers.length);
                 const updates = {};
-
                 selectedPlayers.forEach(winner => {
                     updates[`games/${roomID}/players/${winner}/chips`] = game.players[winner].chips + share;
                 });
-
-                updates[`games/${roomID}/pot`] = 0;
-                if (game.players) {
-                    Object.keys(game.players).forEach(k => {
-                        updates[`games/${roomID}/players/${k}/currentBet`] = 0;
-                        updates[`games/${roomID}/players/${k}/status`] = 'active';
-                    });
-                }
-
                 update(ref(db), updates);
-                playSound([523, 659, 784, 1047], 0.4);
-                createConfetti(window.innerWidth / 2, window.innerHeight / 2, 50);
                 toggleSplitMode();
+                nextRound(); // Auto advance round after splitting
             });
         }
 
-        // SINGLE WINNER
         window.givePot = function (name) {
             if (splitMode) return;
-            
             get(ref(db, `games/${roomID}`)).then(snap => {
                 const game = snap.val();
                 const potAmount = game.pot || 0;
-                
                 if (potAmount === 0) return alert("Pot is empty!");
                 if (!confirm(`Give $${potAmount} to ${name}?`)) return;
 
                 const updates = {};
                 updates[`games/${roomID}/players/${name}/chips`] = game.players[name].chips + potAmount;
-                updates[`games/${roomID}/pot`] = 0;
-                
-                if (game.players) {
-                    Object.keys(game.players).forEach(k => {
-                        updates[`games/${roomID}/players/${k}/currentBet`] = 0;
-                        updates[`games/${roomID}/players/${k}/status`] = 'active';
-                    });
-                }
-                
                 update(ref(db), updates);
+                
                 playSound([523, 659, 784, 1047], 0.5);
                 
                 // Confetti at winner's card
@@ -890,21 +690,19 @@
                         createConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2, 40);
                     }
                 });
+
+                setTimeout(() => nextRound(), 2000); // Auto advance after 2s glory
             });
         }
 
         window.resetGame = function () {
             if (!confirm("RESET ENTIRE GAME? All chips → $1000")) return;
-            
-            dealerIndex = 0;
-            biggestPot = 0;
-            
             get(ref(db, `games/${roomID}`)).then(snap => {
                 const game = snap.val();
                 const updates = {};
                 updates[`games/${roomID}/pot`] = 0;
-                updates[`games/${roomID}/handsPlayed`] = 0;
-                updates[`games/${roomID}/biggestPot`] = 0;
+                updates[`games/${roomID}/dealerIndex`] = 0;
+                updates[`games/${roomID}/turnIndex`] = 0;
                 
                 if (game.players) {
                     Object.keys(game.players).forEach(k => {
@@ -923,13 +721,12 @@
             pile.innerHTML = "";
             let remaining = amount;
             const chips = [];
-            
             while (remaining >= 100) { chips.push(100); remaining -= 100; }
             while (remaining >= 25) { chips.push(25); remaining -= 25; }
             while (remaining >= 5) { chips.push(5); remaining -= 5; }
             while (remaining >= 1) { chips.push(1); remaining -= 1; }
             
-            const max = 50;
+            const max = 50; // Cap visual chips to prevent lag
             const step = Math.ceil(chips.length / max);
             
             for (let i = 0; i < chips.length; i += (step > 1 ? step : 1)) {
@@ -943,16 +740,14 @@
                 d.className = `chip-visual ${cls}`;
                 d.innerText = val;
                 
-                const angle = (i / chips.length) * Math.PI * 2;
-                const radius = 80 + Math.random() * 40;
+                const angle = Math.random() * Math.PI * 2;
+                const radius = Math.random() * 80;
                 const x = Math.cos(angle) * radius;
                 const y = Math.sin(angle) * radius;
                 const rot = Math.random() * 360;
-                const stackHeight = Math.floor(i / 10) * -3;
                 
-                d.style.transform = `translate(${x}px, ${y + stackHeight}px) rotate(${rot}deg)`;
-                d.style.zIndex = Math.floor(i / 10);
-                
+                d.style.transform = `translate(${x}px, ${y}px) rotate(${rot}deg)`;
+                d.style.zIndex = i;
                 pile.appendChild(d);
             }
         }
