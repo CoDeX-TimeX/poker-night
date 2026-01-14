@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Poker Player VIP</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@400;700&display=swap');
@@ -29,6 +29,18 @@
             display: flex;
             flex-direction: column;
             position: relative;
+            transition: box-shadow 0.3s ease;
+        }
+
+        /* Safe area support for notch devices */
+        body {
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        /* TURN GLOW ANIMATION */
+        body.my-turn {
+            box-shadow: inset 0 0 0 6px #2ecc71;
         }
 
         /* Felt Texture Overlay */
@@ -119,6 +131,43 @@
             letter-spacing: 2px;
         }
 
+        /* TURN WAITING OVERLAY */
+        #turn-waiting-overlay {
+            display: flex;
+            position: absolute;
+            top: 70px;
+            left: 0;
+            width: 100%;
+            height: calc(100% - 70px);
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 850;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(3px);
+            transition: opacity 0.3s;
+        }
+
+        .waiting-text {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 30px;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 2px;
+            text-align: center;
+        }
+
+        .waiting-name {
+            color: #ffd700;
+            font-size: 40px;
+            margin-top: 10px;
+            animation: pulseText 1.5s infinite;
+        }
+
+        @keyframes pulseText {
+            0%, 100% { opacity: 0.5; transform: scale(0.98); }
+            50% { opacity: 1; transform: scale(1.02); }
+        }
+
         /* FOLD OVERLAY */
         #folded-overlay {
             display: none;
@@ -165,12 +214,6 @@
             transition: all 0.3s;
         }
 
-        .btn-unfold:hover {
-            background: rgba(255,255,255,0.2);
-            border-color: #fff;
-            color: #fff;
-        }
-
         /* MIDDLE AREA */
         .middle-stage {
             flex-grow: 1;
@@ -180,6 +223,7 @@
             justify-content: center;
             position: relative;
             padding: 20px;
+            padding-bottom: 0;
         }
 
         .balance-container {
@@ -281,7 +325,8 @@
             transform: scale(0.95);
         }
 
-        .btn-push {
+        /* MAIN ACTION BUTTON (Smart Check/Call/Bet) */
+        .btn-main-action {
             background: linear-gradient(145deg, #2ecc71, #27ae60);
             color: white;
             border: none;
@@ -296,33 +341,22 @@
             transition: all 0.2s;
             font-family: 'Bebas Neue', sans-serif;
             letter-spacing: 1px;
+            min-width: 140px;
         }
 
-        .btn-push:active {
+        .btn-main-action:active {
             transform: translateY(3px);
             box-shadow: 0 3px 15px rgba(46, 204, 113, 0.4);
         }
 
-        .btn-call {
+        .btn-main-action.check-mode {
             background: linear-gradient(145deg, #3498db, #2980b9);
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 16px;
-            display: none;
-            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4),
-                        inset 0 -3px 8px rgba(0,0,0,0.3);
-            cursor: pointer;
-            animation: callPulse 2s infinite;
-            font-family: 'Bebas Neue', sans-serif;
-            letter-spacing: 1px;
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4), inset 0 -3px 8px rgba(0,0,0,0.3);
         }
-
-        @keyframes callPulse {
-            0%, 100% { box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4); }
-            50% { box-shadow: 0 6px 30px rgba(52, 152, 219, 0.8); }
+        
+        .btn-main-action.call-mode {
+            background: linear-gradient(145deg, #f39c12, #d35400);
+            box-shadow: 0 6px 20px rgba(243, 156, 18, 0.4), inset 0 -3px 8px rgba(0,0,0,0.3);
         }
 
         .btn-allin {
@@ -333,7 +367,7 @@
             border-radius: 10px;
             font-weight: bold;
             font-size: 16px;
-            display: none;
+            display: block;
             box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4),
                         inset 0 -3px 8px rgba(0,0,0,0.3);
             cursor: pointer;
@@ -354,17 +388,21 @@
 
         /* CHIPS - 3D REALISTIC */
         .chip-dock {
-            height: 120px;
+            min-height: 140px;
+            padding-bottom: 20px;
             background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 100%);
             border-top: 2px solid rgba(255,255,255,0.1);
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 25px;
-            padding: 0 20px;
+            gap: 20px;
+            padding-left: 20px;
+            padding-right: 20px;
             box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
             position: relative;
             z-index: 50;
+            flex-wrap: wrap;
+            padding-top: 15px;
         }
 
         .chip {
@@ -395,81 +433,22 @@
                 currentColor 0deg 20deg,
                 transparent 20deg 40deg
             );
-            -webkit-mask: 
-                linear-gradient(#fff 0 0) content-box, 
-                linear-gradient(#fff 0 0);
-            mask: 
-                linear-gradient(#fff 0 0) content-box, 
-                linear-gradient(#fff 0 0);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
         }
 
-        /* Inner detail circle */
-        .chip::after {
-            content: '';
-            position: absolute;
-            inset: 12px;
-            border-radius: 50%;
-            border: 2px dashed currentColor;
-            opacity: 0.4;
-        }
+        .chip:active { transform: scale(0.9) translateY(3px); }
+        .chip:hover { transform: scale(1.05); filter: brightness(1.2); }
 
-        .chip:active {
-            transform: scale(0.9) translateY(3px);
-        }
+        /* Chips Colors */
+        .c1 { background: radial-gradient(circle at 30% 30%, #ffffff, #e8e8e8 60%, #c0c0c0); color: #333; box-shadow: 0 6px 20px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.8); }
+        .c5 { background: radial-gradient(circle at 30% 30%, #ff6b6b, #e74c3c 60%, #c0392b); color: white; box-shadow: 0 6px 20px rgba(231, 76, 60, 0.5), inset 0 1px 0 rgba(255,255,255,0.3); }
+        .c25 { background: radial-gradient(circle at 30% 30%, #2ecc71, #27ae60 60%, #229954); color: white; box-shadow: 0 6px 20px rgba(46, 204, 113, 0.5), inset 0 1px 0 rgba(255,255,255,0.3); }
+        .c100 { background: radial-gradient(circle at 30% 30%, #34495e, #2c3e50 60%, #1a252f); color: #ffd700; box-shadow: 0 6px 20px rgba(52, 73, 94, 0.6), inset 0 1px 0 rgba(255,255,255,0.2); }
 
-        .chip:hover {
-            transform: scale(1.05);
-            filter: brightness(1.2);
-        }
-
-        /* White Chip - $1 */
-        .c1 {
-            background: radial-gradient(circle at 30% 30%, #ffffff, #e8e8e8 60%, #c0c0c0);
-            color: #333;
-            box-shadow: 
-                0 6px 20px rgba(0,0,0,0.4),
-                inset 0 1px 0 rgba(255,255,255,0.8),
-                inset 0 -2px 5px rgba(0,0,0,0.2);
-        }
-
-        /* Red Chip - $5 */
-        .c5 {
-            background: radial-gradient(circle at 30% 30%, #ff6b6b, #e74c3c 60%, #c0392b);
-            color: white;
-            box-shadow: 
-                0 6px 20px rgba(231, 76, 60, 0.5),
-                inset 0 1px 0 rgba(255,255,255,0.3),
-                inset 0 -2px 5px rgba(0,0,0,0.3);
-        }
-
-        /* Green Chip - $25 */
-        .c25 {
-            background: radial-gradient(circle at 30% 30%, #2ecc71, #27ae60 60%, #229954);
-            color: white;
-            box-shadow: 
-                0 6px 20px rgba(46, 204, 113, 0.5),
-                inset 0 1px 0 rgba(255,255,255,0.3),
-                inset 0 -2px 5px rgba(0,0,0,0.3);
-        }
-
-        /* Black Chip - $100 */
-        .c100 {
-            background: radial-gradient(circle at 30% 30%, #34495e, #2c3e50 60%, #1a252f);
-            color: #ffd700;
-            box-shadow: 
-                0 6px 20px rgba(0,0,0,0.7),
-                0 0 15px rgba(255, 215, 0, 0.3),
-                inset 0 1px 0 rgba(255,255,255,0.2),
-                inset 0 -2px 5px rgba(0,0,0,0.5);
-        }
-
-        .c100::before {
-            color: #ffd700;
-        }
-
-        /* LOGIN */
+        /* LOGIN SCREEN */
         #login-screen {
             position: fixed;
             top: 0;
@@ -480,72 +459,60 @@
             z-index: 9999;
             display: flex;
             flex-direction: column;
-            align-items: center;
             justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
 
         .login-title {
             color: #ffd700;
-            letter-spacing: 5px;
-            font-size: 48px;
+            font-size: 64px;
             font-family: 'Bebas Neue', sans-serif;
-            margin-bottom: 40px;
-            text-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+            letter-spacing: 8px;
+            margin-bottom: 50px;
+            text-shadow: 0 0 40px rgba(255, 215, 0, 0.8);
         }
 
         .login-input {
+            padding: 18px 30px;
+            font-size: 22px;
+            text-align: center;
+            margin: 12px;
+            border-radius: 12px;
             background: rgba(0,0,0,0.4);
             backdrop-filter: blur(10px);
             border: 2px solid rgba(255, 215, 0, 0.3);
             color: #ffd700;
-            padding: 16px 24px;
-            width: 70%;
+            width: 90%;
             max-width: 350px;
-            font-size: 18px;
-            text-align: center;
-            margin: 10px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            transition: all 0.3s;
-        }
-
-        .login-input:focus {
-            outline: none;
-            border-color: #ffd700;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
         }
 
         .login-btn {
-            background: linear-gradient(145deg, #ffd700, #f39c12);
-            color: #000;
+            padding: 18px 60px;
+            font-size: 24px;
+            background: linear-gradient(145deg, #2ecc71, #27ae60);
             border: none;
-            padding: 16px 50px;
-            font-size: 22px;
+            cursor: pointer;
+            border-radius: 12px;
+            color: white;
             font-weight: bold;
             margin-top: 30px;
-            border-radius: 12px;
-            cursor: pointer;
-            box-shadow: 0 6px 25px rgba(255, 215, 0, 0.4),
-                        inset 0 -3px 8px rgba(0,0,0,0.2);
             font-family: 'Bebas Neue', sans-serif;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
+            box-shadow: 0 6px 25px rgba(46, 204, 113, 0.5);
             transition: all 0.2s;
-        }
-
-        .login-btn:active {
-            transform: translateY(3px);
-            box-shadow: 0 3px 15px rgba(255, 215, 0, 0.4);
         }
 
         /* INFO BADGE */
         .info-badge {
             position: absolute;
-            top: 15px;
+            top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0,0,0,0.7);
             backdrop-filter: blur(10px);
-            padding: 8px 20px;
+            padding: 10px 20px;
             border-radius: 20px;
             font-size: 13px;
             color: #ffd700;
@@ -553,25 +520,6 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             font-weight: bold;
             letter-spacing: 1px;
-        }
-
-        /* PARTICLES */
-        .particle {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            background: #ffd700;
-            border-radius: 50%;
-            pointer-events: none;
-            animation: particleFall 1s forwards;
-            box-shadow: 0 0 10px #ffd700;
-        }
-
-        @keyframes particleFall {
-            to {
-                transform: translateY(100vh) rotate(720deg);
-                opacity: 0;
-            }
         }
 
         /* FLYING CHIP ANIMATION */
@@ -586,17 +534,9 @@
         }
 
         @keyframes flyToPot {
-            0% {
-                transform: scale(1) rotate(0deg);
-                opacity: 1;
-            }
-            50% {
-                transform: scale(1.3) rotate(180deg);
-            }
-            100% {
-                transform: scale(0.5) rotate(360deg);
-                opacity: 0;
-            }
+            0% { transform: scale(1) rotate(0deg); opacity: 1; }
+            50% { transform: scale(1.3) rotate(180deg); }
+            100% { transform: scale(0.5) rotate(360deg); opacity: 0; }
         }
 
         /* SCREEN FLASH */
@@ -617,24 +557,6 @@
             50% { opacity: 0.5; }
         }
 
-        /* VICTORY OVERLAY */
-        .victory-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle, rgba(255,215,0,0.3) 0%, transparent 70%);
-            pointer-events: none;
-            z-index: 9997;
-            animation: victoryGlow 1s;
-        }
-
-        @keyframes victoryGlow {
-            0%, 100% { opacity: 0; }
-            50% { opacity: 1; }
-        }
-
         /* BET HISTORY */
         .bet-history {
             position: absolute;
@@ -649,13 +571,15 @@
             backdrop-filter: blur(10px);
         }
 
-        .bet-history-item {
-            padding: 5px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
+        .bet-history-item { padding: 5px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .bet-history-item:last-child { border-bottom: none; }
 
-        .bet-history-item:last-child {
-            border-bottom: none;
+        /* Mobile adjustments */
+        @media (max-height: 700px) {
+            .balance-val { font-size: 36px; }
+            .staged-total { font-size: 42px; }
+            .chip { width: 60px; height: 60px; font-size: 16px; }
+            .chip-dock { min-height: 120px; gap: 15px; }
         }
     </style>
 </head>
@@ -667,9 +591,15 @@
     <div id="login-screen">
         <div class="login-title">POKER VIP</div>
         <input id="room" class="login-input" placeholder="Room Code" autocomplete="off">
-        <input id="pass" class="login-input" type="number" placeholder="Password" autocomplete="off">
+        <input id="pass" class="login-input" placeholder="Password" autocomplete="off">
         <input id="name" class="login-input" placeholder="Player Name" autocomplete="off">
         <button class="login-btn" onclick="joinGame()">ENTER TABLE</button>
+    </div>
+
+    <!-- NEW: WAITING OVERLAY -->
+    <div id="turn-waiting-overlay">
+        <div class="waiting-text">WAITING FOR ACTION</div>
+        <div class="waiting-name" id="waiting-for-name">...</div>
     </div>
 
     <div id="folded-overlay">
@@ -699,21 +629,22 @@
             </div>
 
             <div class="staging-box">
-                <div class="staging-label">BETTING</div>
+                <div class="staging-label">STAGED</div>
                 <div class="staged-total" id="staged-val">$0</div>
-
-                <div class="quick-bets" id="quick-bets" style="display:none;">
+                
+                <div id="quick-bets" class="quick-bets" style="display:none;">
                     <button class="btn-quick" onclick="quickBet('half')">½ POT</button>
                     <button class="btn-quick" onclick="quickBet('pot')">POT</button>
-                    <button class="btn-quick" onclick="quickBet('2x')">2x POT</button>
+                    <button class="btn-quick" onclick="quickBet('2x')">2× POT</button>
                 </div>
 
                 <div class="action-row">
+                    <!-- Dynamic Main Button -->
+                    <button class="btn-main-action check-mode" id="btn-smart" onclick="smartAction()">CHECK</button>
                     <button class="btn-clear" onclick="clearStage()">CLEAR</button>
-                    <button class="btn-call" id="btn-call" onclick="matchCall()">CALL $0</button>
-                    <button class="btn-allin" id="btn-allin" onclick="goAllIn()">ALL IN</button>
-                    <button class="btn-push" onclick="pushToPot()">BET</button>
                 </div>
+                
+                <button class="btn-allin" id="btn-allin" onclick="goAllIn()">♠️ ALL IN ♠️</button>
             </div>
         </div>
 
@@ -741,41 +672,49 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        let roomID = "", myName = "", currentBalance = 1000, stagedAmount = 0;
-        let myCurrentBet = 0, highestBet = 0, currentPot = 0;
+        let roomID = "";
+        let myName = "";
+        let stagedAmount = 0;
+        let currentBalance = 1000;
+        let myCurrentBet = 0;
+        let highestBet = 0;
+        let currentPot = 0;
         let betHistory = [];
+        
+        // NEW STATE VARS
+        let isMyTurn = false;
+        let seatList = [];
+        let currentTurnIndex = 0;
 
-        // AUDIO SYSTEM
+        // SOUNDS & HAPTICS
         const sounds = {
-            chipClick: createSound([800, 1000], 0.05, 'sine'),
-            chipSlide: createSound([400, 200], 0.15, 'triangle'),
-            chipWin: createSound([523, 659, 784], 0.3, 'sine'),
-            fold: createSound([200, 100], 0.2, 'sawtooth'),
-            allIn: createSound([1047, 1175, 1319, 1568], 0.4, 'square')
+            chipClick: () => playBeep(800, 0.05),
+            chipSlide: () => playBeep([600, 400], 0.1),
+            chipWin: () => playBeep([523, 659, 784], 0.3),
+            fold: () => playBeep([400, 300, 200], 0.2),
+            allIn: () => playBeep([1000, 800, 600, 1200], 0.4),
+            myTurn: () => playBeep([600, 800, 1000], 0.3)
         };
 
-        function createSound(frequencies, duration, type) {
-            return function() {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                frequencies.forEach((freq, i) => {
-                    const oscillator = audioContext.createOscillator();
-                    const gainNode = audioContext.createGain();
-                    oscillator.connect(gainNode);
-                    gainNode.connect(audioContext.destination);
-                    oscillator.frequency.value = freq;
-                    oscillator.type = type;
-                    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-                    oscillator.start(audioContext.currentTime + i * 0.05);
-                    oscillator.stop(audioContext.currentTime + duration + i * 0.05);
-                });
-            };
+        function playBeep(frequencies, duration = 0.15) {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            if (!Array.isArray(frequencies)) frequencies = [frequencies];
+            frequencies.forEach((freq, i) => {
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+                osc.frequency.value = freq;
+                osc.type = 'sine';
+                gain.gain.setValueAtTime(0.08, audioContext.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+                osc.start(audioContext.currentTime + i * 0.05);
+                osc.stop(audioContext.currentTime + duration + i * 0.05);
+            });
         }
 
         function vibrate(pattern) {
-            if (navigator.vibrate) {
-                navigator.vibrate(pattern);
-            }
+            if ('vibrate' in navigator) navigator.vibrate(pattern);
         }
 
         function screenFlash() {
@@ -783,18 +722,6 @@
             flash.className = 'screen-flash';
             document.body.appendChild(flash);
             setTimeout(() => flash.remove(), 300);
-        }
-
-        function createParticles(x, y, count = 20) {
-            for (let i = 0; i < count; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = x + 'px';
-                particle.style.top = y + 'px';
-                particle.style.animationDelay = (i * 0.05) + 's';
-                document.body.appendChild(particle);
-                setTimeout(() => particle.remove(), 1000);
-            }
         }
 
         function addBetToHistory(amount, action) {
@@ -836,16 +763,27 @@
 
         function initPlayer() {
             const myRef = ref(db, `games/${roomID}/players/${myName}`);
-            update(myRef, { status: 'active' });
             get(myRef).then(snap => {
-                if (!snap.exists()) update(myRef, { chips: 1000, currentBet: 0, status: 'active' });
+                if (!snap.exists()) {
+                    update(myRef, { chips: 1000, currentBet: 0, status: 'active' });
+                } else {
+                    update(myRef, { status: 'active' });
+                }
+                
+                // Add to seats if not exists
+                get(ref(db, `games/${roomID}/seats`)).then(seatSnap => {
+                    let seats = seatSnap.val() || [];
+                    if(!seats.includes(myName)) {
+                        seats.push(myName);
+                        update(ref(db, `games/${roomID}`), { seats: seats });
+                    }
+                });
             });
 
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-interface').style.display = 'flex';
             document.getElementById('disp-name').innerText = myName;
             
-            // Random avatar emoji
             const avatars = ['🃏', '♠️', '♥️', '♦️', '♣️', '🎰', '🎲', '👑'];
             document.getElementById('avatar').innerText = avatars[Math.floor(Math.random() * avatars.length)];
 
@@ -857,27 +795,15 @@
                     myCurrentBet = data.currentBet || 0;
                     document.getElementById('disp-bal').innerText = "$" + currentBalance;
 
-                    // Low chips warning
                     const balEl = document.getElementById('disp-bal');
-                    if (currentBalance < 100) {
-                        balEl.classList.add('low');
-                    } else {
-                        balEl.classList.remove('low');
-                    }
+                    if (currentBalance < 100) balEl.classList.add('low');
+                    else balEl.classList.remove('low');
 
-                    // Show all-in button if low
-                    if (currentBalance < 200) {
-                        document.getElementById('btn-allin').style.display = 'block';
-                    } else {
-                        document.getElementById('btn-allin').style.display = 'none';
-                    }
-
-                    // Fold overlay
                     const overlay = document.getElementById('folded-overlay');
                     if (data.status === 'folded') overlay.style.display = 'flex';
                     else overlay.style.display = 'none';
 
-                    updateCallButton();
+                    updateSmartButton();
                 }
             });
 
@@ -886,13 +812,8 @@
                 const game = s.val();
                 if (game) {
                     currentPot = game.pot || 0;
-                    
-                    // Show quick bet buttons if pot > 0
-                    if (currentPot > 0) {
-                        document.getElementById('quick-bets').style.display = 'flex';
-                    } else {
-                        document.getElementById('quick-bets').style.display = 'none';
-                    }
+                    if (currentPot > 0) document.getElementById('quick-bets').style.display = 'flex';
+                    else document.getElementById('quick-bets').style.display = 'none';
 
                     if (game.players) {
                         let max = 0;
@@ -900,71 +821,121 @@
                             if ((p.currentBet || 0) > max) max = p.currentBet;
                         });
                         highestBet = max;
-                        updateCallButton();
+                        updateSmartButton();
                     }
+
+                    // TURN LOGIC
+                    seatList = game.seats || [];
+                    currentTurnIndex = game.turnIndex || 0;
+                    handleTurnDisplay();
                 }
             });
         }
 
-        function updateCallButton() {
-            const diff = highestBet - myCurrentBet;
-            const btn = document.getElementById('btn-call');
-            const infoBadge = document.getElementById('call-info');
-
-            if (diff > 0) {
-                infoBadge.innerText = `TABLE: $${highestBet}`;
-                infoBadge.style.borderColor = 'rgba(231, 76, 60, 0.5)';
-                infoBadge.style.color = '#e74c3c';
+        function handleTurnDisplay() {
+            const activePlayer = seatList[currentTurnIndex];
+            const overlay = document.getElementById('turn-waiting-overlay');
+            const nameDisplay = document.getElementById('waiting-for-name');
+            
+            if (activePlayer === myName) {
+                // IT IS MY TURN
+                if (!isMyTurn) {
+                    // Just became my turn
+                    isMyTurn = true;
+                    sounds.myTurn();
+                    vibrate([100, 50, 100, 50, 100]);
+                    document.body.classList.add('my-turn');
+                }
+                overlay.style.opacity = '0';
+                setTimeout(() => overlay.style.display = 'none', 300); // Fade out
             } else {
-                infoBadge.innerText = `TABLE: $${highestBet}`;
-                infoBadge.style.borderColor = 'rgba(255, 215, 0, 0.3)';
-                infoBadge.style.color = '#ffd700';
-            }
-
-            if (diff > 0 && stagedAmount < diff) {
-                btn.style.display = 'block';
-                btn.innerText = `CALL $${diff}`;
-                btn.dataset.needed = diff;
-            } else {
-                btn.style.display = 'none';
+                // NOT MY TURN
+                isMyTurn = false;
+                document.body.classList.remove('my-turn');
+                overlay.style.display = 'flex';
+                setTimeout(() => overlay.style.opacity = '1', 10);
+                nameDisplay.innerText = activePlayer || "Starting...";
             }
         }
 
-        window.matchCall = function () {
-            const diff = parseInt(document.getElementById('btn-call').dataset.needed || 0);
-            if (diff === 0) return;
+        // Logic for "Smart Button" (Check vs Call vs Raise)
+        function updateSmartButton() {
+            const btn = document.getElementById('btn-smart');
+            const diff = highestBet - myCurrentBet;
             
-            if (diff > currentBalance) {
-                stagedAmount = currentBalance;
-                alert("ALL IN! Calling with everything you have.");
-                sounds.allIn();
-                vibrate([100, 50, 100, 50, 100]);
-                screenFlash();
+            // Update Table Info Badge
+            const infoBadge = document.getElementById('call-info');
+            infoBadge.innerText = `TABLE: $${highestBet}`;
+            if (diff > 0) infoBadge.style.color = '#e74c3c';
+            else infoBadge.style.color = '#ffd700';
+
+            // Determine Button State
+            if (stagedAmount === 0) {
+                if (diff === 0) {
+                    // CHECK
+                    btn.innerText = "CHECK";
+                    btn.className = "btn-main-action check-mode";
+                } else {
+                    // CALL
+                    btn.innerText = `CALL $${diff}`;
+                    btn.className = "btn-main-action call-mode";
+                }
             } else {
-                stagedAmount = diff;
-                sounds.chipClick();
-                vibrate(50);
+                // BET / RAISE
+                const total = myCurrentBet + stagedAmount;
+                if (total > highestBet) {
+                    btn.innerText = `RAISE TO $${total}`;
+                    btn.className = "btn-main-action"; // Green
+                } else if (total === highestBet) {
+                    btn.innerText = "CALL";
+                    btn.className = "btn-main-action call-mode";
+                } else {
+                    // Adding chips but not enough to call yet
+                    btn.innerText = `ADD $${diff - stagedAmount} MORE`;
+                    btn.className = "btn-main-action"; 
+                }
             }
-            
-            document.getElementById('staged-val').innerText = "$" + stagedAmount;
-            updateCallButton();
+        }
+
+        window.smartAction = function() {
+            if (!isMyTurn) return; // Should be blocked by overlay anyway
+
+            const diff = highestBet - myCurrentBet;
+
+            // Scenario 1: Auto-Fill Call
+            if (stagedAmount === 0 && diff > 0) {
+                if (diff > currentBalance) {
+                    // All in call
+                    stagedAmount = currentBalance;
+                } else {
+                    // Normal call
+                    stagedAmount = diff;
+                }
+                pushToPot(); // Execute immediately
+                return;
+            }
+
+            // Scenario 2: Check or Bet/Raise
+            pushToPot();
         }
 
         window.addChip = function (amt) {
+            if (!isMyTurn) return; 
+            
             if (stagedAmount + amt > currentBalance) {
-                alert("Not enough chips! (Tap and hold chip for 10x)");
+                alert("Not enough chips! (Tap and hold for 10x)");
                 vibrate(200);
                 return;
             }
             stagedAmount += amt;
             document.getElementById('staged-val').innerText = "$" + stagedAmount;
-            updateCallButton();
+            updateSmartButton();
             sounds.chipClick();
             vibrate(30);
         }
 
         window.longPress = function(amt) {
-            // Right-click / long press for 10x
+            if (!isMyTurn) return false;
             const multiplied = amt * 10;
             if (stagedAmount + multiplied > currentBalance) {
                 alert("Not enough chips for 10x!");
@@ -972,14 +943,15 @@
             } else {
                 stagedAmount += multiplied;
                 document.getElementById('staged-val').innerText = "$" + stagedAmount;
-                updateCallButton();
+                updateSmartButton();
                 sounds.chipSlide();
                 vibrate([50, 30, 50]);
             }
-            return false; // Prevent context menu
+            return false; 
         }
 
         window.quickBet = function(type) {
+            if (!isMyTurn) return;
             let amount = 0;
             if (type === 'half') amount = Math.floor(currentPot / 2);
             else if (type === 'pot') amount = currentPot;
@@ -988,44 +960,29 @@
             if (amount > currentBalance) amount = currentBalance;
             stagedAmount = amount;
             document.getElementById('staged-val').innerText = "$" + stagedAmount;
-            updateCallButton();
+            updateSmartButton();
             sounds.chipSlide();
             vibrate(50);
         }
 
         window.goAllIn = function() {
+            if (!isMyTurn) return;
             if (confirm("GO ALL IN with $" + currentBalance + "?")) {
                 stagedAmount = currentBalance;
-                document.getElementById('staged-val').innerText = "$" + stagedAmount;
-                updateCallButton();
-                sounds.allIn();
-                vibrate([100, 50, 100, 50, 200]);
-                screenFlash();
+                pushToPot();
             }
         }
 
         window.clearStage = function () {
             stagedAmount = 0;
             document.getElementById('staged-val').innerText = "$0";
-            updateCallButton();
+            updateSmartButton();
             vibrate(30);
         }
 
-        window.pushToPot = function () {
-            if (stagedAmount === 0) {
-                alert("Stage some chips first!");
-                vibrate(100);
-                return;
-            }
-            
-            if (stagedAmount > currentBalance) {
-                alert("Error: Not enough chips!");
-                vibrate(200);
-                return;
-            }
-
-            // Flying chip animation
-            createFlyingChip(stagedAmount);
+        function pushToPot() {
+            // Animation
+            if (stagedAmount > 0) createFlyingChip(stagedAmount);
 
             get(ref(db, `games/${roomID}`)).then(snap => {
                 const game = snap.val();
@@ -1033,47 +990,83 @@
                 updates[`games/${roomID}/players/${myName}/chips`] = currentBalance - stagedAmount;
                 updates[`games/${roomID}/players/${myName}/currentBet`] = myCurrentBet + stagedAmount;
                 updates[`games/${roomID}/pot`] = (game.pot || 0) + stagedAmount;
-                update(ref(db), updates);
-
-                addBetToHistory(stagedAmount, stagedAmount >= currentBalance ? 'ALL IN' : 'BET');
+                
+                // History
+                let actionText = "CHECK";
+                if (stagedAmount > 0) actionText = "BET";
+                if ((myCurrentBet + stagedAmount) === highestBet && stagedAmount > 0) actionText = "CALL";
+                if (stagedAmount >= currentBalance) actionText = "ALL IN";
+                
+                addBetToHistory(stagedAmount, actionText);
                 sounds.chipSlide();
                 vibrate([50, 30]);
 
+                // Reset Local Stage
                 stagedAmount = 0;
                 document.getElementById('staged-val').innerText = "$0";
+
+                // PASS TURN
+                update(ref(db), updates).then(() => {
+                    passTurn(game);
+                });
             });
         }
 
         function createFlyingChip(amount) {
             const chip = document.createElement('div');
             chip.className = 'flying-chip';
-            
-            // Determine chip color based on amount
             if (amount >= 100) chip.style.background = 'radial-gradient(circle, #34495e, #2c3e50)';
             else if (amount >= 25) chip.style.background = 'radial-gradient(circle, #2ecc71, #27ae60)';
             else if (amount >= 5) chip.style.background = 'radial-gradient(circle, #e74c3c, #c0392b)';
             else chip.style.background = 'radial-gradient(circle, #ffffff, #e8e8e8)';
-
             chip.style.left = '50%';
-            chip.style.bottom = '100px';
+            chip.style.bottom = '180px';
             chip.style.boxShadow = '0 4px 15px rgba(0,0,0,0.5)';
-            
             document.body.appendChild(chip);
             setTimeout(() => chip.remove(), 600);
         }
 
         window.foldHand = function () {
+            if (!isMyTurn) return; 
             if (confirm("Fold this hand?")) {
-                update(ref(db, `games/${roomID}/players/${myName}`), { status: 'folded' });
-                sounds.fold();
-                vibrate([100, 50, 100]);
-                addBetToHistory(0, 'FOLD');
+                get(ref(db, `games/${roomID}`)).then(snap => {
+                    const game = snap.val();
+                    update(ref(db, `games/${roomID}/players/${myName}`), { status: 'folded' })
+                    .then(() => {
+                        sounds.fold();
+                        vibrate([100, 50, 100]);
+                        addBetToHistory(0, 'FOLD');
+                        passTurn(game);
+                    });
+                });
             }
         }
 
         window.unfold = function () {
             update(ref(db, `games/${roomID}/players/${myName}`), { status: 'active' });
             vibrate(50);
+        }
+
+        function passTurn(game) {
+            // Find next eligible player
+            let nextIndex = (currentTurnIndex + 1) % seatList.length;
+            let loopCount = 0;
+            
+            // Recursive check to skip folded players
+            const findNext = (idx) => {
+                const pName = seatList[idx];
+                const pData = game.players[pName];
+                // Check if player exists and is active
+                if (pData && pData.status !== 'folded') {
+                    return idx;
+                }
+                if (loopCount > seatList.length) return idx; // Safety break
+                loopCount++;
+                return findNext((idx + 1) % seatList.length);
+            };
+
+            const actualNextIndex = findNext(nextIndex);
+            update(ref(db, `games/${roomID}`), { turnIndex: actualNextIndex });
         }
     </script>
 </body>
